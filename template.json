@@ -10,33 +10,35 @@
                 "closed": "closed"
             },
             "id": "ticket_status",
-            "internal": true
+            "internal": true,
+            "priority": 0
         },
         "notes": {
             "type": "message",
             "id": "ticket_notes",
-            "internal": true
+            "internal": true,
+            "priority": 0
         },
         "posted": {
             "type": "text",
             "disabled": true,
-            "internal": true
+            "internal": true,
+            "priority": 0
         },
-        "comments": {
-            "type": "message",
-            "disabled": true
-        },
-
         "name": {
             "type": "text",
-            "required": true
+            "required": true,
+            "priority": 1
         },
         "email": {
             "type": "email",
-            "required": true
+            "required": true,
+            "verify": "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+            "priority": 1
         },
         "phone": {
-            "type": "phone"
+            "type": "phone",
+            "priority": 1
         },
         "method": {
             "type": "selection",
@@ -44,7 +46,9 @@
                 "Email": "Email",
                 "Text": "Text",
                 "Call": "Call"
-            }
+            },
+            "label": "Preferred contact method",
+            "priority": 1
         },
         "best_time": {
             "type": "selection",
@@ -54,7 +58,14 @@
                 "Evening": "Evening",
                 "Anytime": "Anytime",
                 "Other": "Other"
-            }
+            },
+            "label": "Best Contact Time",
+            "priority": 1
+        },
+        "comments": {
+            "type": "message",
+            "disabled": true,
+            "priority": 99
         }
     },
     "contact": {
@@ -68,7 +79,9 @@
                 "Office": "Office",
                 "Video Editing": "Video Editing",
                 "Other": "Other"
-            }
+            },
+            "label": "Computer Use Case (if multiple, select most often)",
+            "priority": 2
         },
         "rgb_preference": {
             "type": "selection",
@@ -76,21 +89,27 @@
                 "Doesn't Matter": "Doesn't Matter",
                 "No RGB for Me": "No RGB for Me",
                 "I love Vegas": "I love Vegas"
-            }
+            },
+            "label": "Do you enjoy RGB?",
+            "priority": 2
         },
         "brand_preference": {
             "type": "selection",
             "options": {
                 "Doesn't Matter": "Doesn't Matter",
                 "Yes": "Yes"
-            }
+            },
+            "label": "Are you particular about brands?",
+            "priority": 2
         },
         "upgradability": {
             "type": "selection",
             "options": {
                 "New Parts": "New Parts",
                 "New Computer": "New Computer"
-            }
+            },
+            "label": "When you want an upgrade, which do you prefer?",
+            "priority": 2
         },
         "tier": {
             "type": "selection",
@@ -99,7 +118,9 @@
                 "tier2": "$25 - Part Selection",
                 "tier3": "$35 - PC Build",
                 "tier4": "$50 - Everything"
-            }
+            },
+            "label": "Service Tier",
+            "priority": 2
         }
     }
 }

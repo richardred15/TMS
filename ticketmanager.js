@@ -7,14 +7,41 @@ const DEFAULT = "default";
 let templates = JSON.parse(fs.readFileSync("template.json"));
 let template_cache = {};
 
+function updateTemplates() {
+    templates = JSON.parse(fs.readFileSync("template.json"));
+    template_cache = {};
+}
+
 function getTemplate(type) {
     if (template_cache[type] == undefined) {
-        let obj = Object.assign(templates[DEFAULT], templates[type]);
-        template_cache[type] = obj;
-        return obj;
+        let def = Object.assign({}, templates[DEFAULT]);
+        let obj = Object.assign(def, templates[type]);
+        let sorted = {};
+        let sortable = [];
+        for (let item in obj) {
+            sortable.push([item, obj[item].priority]);
+        }
+        sortable.sort(function (a, b) {
+            return a[1] - b[1];
+        });
+        sortable.forEach(function (item) {
+            sorted[item[0]] = obj[item[0]];
+        });
+
+        template_cache[type] = sorted;
+        return sorted;
     } else {
         return template_cache[type];
     }
+}
+
+function getUserTemplate(type) {
+    let template = getTemplate(type);
+    let temp = {};
+    for (let item in template) {
+        if (!template[item].internal) temp[item] = template[item];
+    }
+    return temp;
 }
 
 class TicketManager {
@@ -23,21 +50,43 @@ class TicketManager {
         this.tickets = [];
         this.lastTicket = 13425;
         this.getTicketList();
+    }
 
-        this.newTicket({
-            "name": "Richard",
-            "email": "richardred15@gmail.com"
-        }, CONTACT);
+    updateTemplates() {
+        updateTemplates();
+    }
+
+    getUserTemplate(type) {
+        return getUserTemplate(type);
     }
 
     getTicketList() {
-        this.ticketList = fs.readdirSync("tickets");
+        this.ticketList = fs.readdirSync("tickets/open");
+        this.ticketList.push(...fs.readdirSync("tickets/closed"));
         let max = this.lastTicket;
         for (let ticket of this.ticketList) {
             let num = parseInt(ticket.substr(1));
             if (num > max) max = num;
         }
         this.lastTicket = max;
+    }
+
+    getTicket(id) {
+        if (this.tickets[id]) {
+            return this.tickets[id];
+        } else {
+            return this.loadTicket(id);
+        }
+    }
+
+    loadTicket(id) {
+        let ticket = new Ticket(id);
+        if (ticket.loaded) {
+            this.tickets[id] = ticket;
+            return ticket;
+        } else {
+            return false;
+        }
     }
 
     genTicketNumber(type) {
@@ -61,12 +110,15 @@ class TicketManager {
         let verify = this.verifyTicket(data, template);
 
         if (verify.success) {
-            console.log(verify.data);
             let id = this.genTicketNumber(type);
-            this.tickets[id] = new Ticket(id, verify.data);
+
+            verify.data.id = id;
+
+            let ticket = new Ticket(id, verify.data);
+            this.tickets[id] = ticket;
+            return id;
         } else {
-            console.log("FAILED");
-            console.log(verify.failed);
+            return verify.failed;
         }
     }
 
@@ -76,6 +128,12 @@ class TicketManager {
             let check = template[field];
             if (check.required) {
                 if (!data[field] || data[field].trim() == "") {
+                    failed.push(field);
+                }
+            }
+            if (check.verify) {
+                let reg = new RegExp(check.verify);
+                if (!reg.test(data[field]) && !failed.includes(field)) {
                     failed.push(field);
                 }
             }
