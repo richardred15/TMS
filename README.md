@@ -18,4 +18,18 @@ Allow users to create tickets (contact forms) using simple templates
     }
 ```
 
+```javascript
+    "method": {
+        "type": "selection",
+        "options": {
+            "Email": "Email",
+            "Text": "Text",
+            "Call": "Call"
+        },
+        "label": "Preferred contact method",
+        "priority": 1
+    }
+```
+
 ![Field Example](https://i.imgur.com/41ZCdTN.png)
+![Inspect Info](https://i.imgur.com/D0IWJWE.png)
