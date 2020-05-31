@@ -32,4 +32,4 @@ Allow users to create tickets (contact forms) using simple templates
 ```
 
 ![Field Example](https://i.imgur.com/41ZCdTN.png)
-![Inspect Info](https://i.imgur.com/D0IWJWE.png)
+![Inspect Info](https://i.imgur.com/tCxFDnY.png)
