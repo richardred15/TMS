@@ -1,0 +1,25 @@
+{
+  "name": "tms_server",
+  "version": "1.0.0",
+  "description": "Server for TMS",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richardred15/TMS.git"
+  },
+  "author": "richardred15",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/richardred15/TMS/issues"
+  },
+  "homepage": "https://github.com/richardred15/TMS#readme",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "md5": "^2.2.1",
+    "socketio": "^1.0.0"
+  }
+}
