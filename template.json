@@ -1,5 +1,9 @@
 {
     "default": {
+        "letter_code": {
+            "data": "K",
+            "internal": true
+        },
         "status": {
             "type": "selection",
             "disabled": false,
@@ -59,6 +63,7 @@
                 "Anytime": "Anytime",
                 "Other": "Other"
             },
+            "has_other": true,
             "label": "Best Contact Time",
             "priority": 1
         },
@@ -69,9 +74,16 @@
         }
     },
     "contact": {
-
+        "letter_code": {
+            "data": "C",
+            "internal": true
+        }
     },
     "questionnaire": {
+        "letter_code": {
+            "data": "Q",
+            "internal": true
+        },
         "use_case": {
             "type": "selection",
             "options": {
@@ -80,6 +92,7 @@
                 "Video Editing": "Video Editing",
                 "Other": "Other"
             },
+            "has_other": true,
             "label": "Computer Use Case (if multiple, select most often)",
             "priority": 2
         },
@@ -99,6 +112,8 @@
                 "Doesn't Matter": "Doesn't Matter",
                 "Yes": "Yes"
             },
+            "has_other": true,
+            "other_trigger": "Yes",
             "label": "Are you particular about brands?",
             "priority": 2
         },
@@ -106,8 +121,10 @@
             "type": "selection",
             "options": {
                 "New Parts": "New Parts",
-                "New Computer": "New Computer"
+                "New Computer": "New Computer",
+                "Other": "Other"
             },
+            "has_other": true,
             "label": "When you want an upgrade, which do you prefer?",
             "priority": 2
         },

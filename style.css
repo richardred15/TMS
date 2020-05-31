@@ -1,4 +1,4 @@
-form {
+#ticket_form {
     padding: 10px;
     border-radius: 4px;
     box-sizing: border-box;
@@ -8,25 +8,32 @@ form {
     margin-bottom: 20px;
     transition: all 0.3s ease;
     font-family: sans-serif;
+    transition: all 0.3s ease;
+}
+
+#ticket_form.success {
+    overflow: hidden;
+    height: 0px;
+    padding: 0px;
 }
 
 #action_container {
     margin: auto;
 }
 
-form,
+#ticket_form,
 #action_container {
     max-width: 610px;
     width: 100%;
 }
 
-form label {
+#ticket_form label {
     margin: 10px 0px;
     display: block;
     text-transform: capitalize;
 }
 
-form input {
+#ticket_form input {
     width: 100%;
     height: 30px;
     display: block;
@@ -36,21 +43,21 @@ form input {
     border-bottom: 1px solid rgb(197, 197, 197);
 }
 
-input,
-textarea,
-select {
+#ticket_form input,
+#ticket_form textarea,
+#ticket_form select {
     max-width: 600px;
 
 }
 
-form textarea {
+#ticket_form textarea {
     width: 100%;
     height: 100px;
     display: block;
     margin-bottom: 10px;
 }
 
-form button {
+#ticket_form button {
     color: white;
     font-weight: bold;
     background-color: #f26522;
@@ -63,11 +70,11 @@ form button {
     cursor: pointer;
 }
 
-form #cancel_button {
+#ticket_form #cancel_button {
     right: 160px;
 }
 
-form select {
+#ticket_form select {
     width: 100%;
     font-size: 24px;
     height: 30px;
@@ -76,7 +83,83 @@ form select {
     border-bottom: 1px solid rgb(197, 197, 197);
 }
 
+#ticket_form .other {
+    margin-top: 0px;
+    height: 0px;
+    border-width: 0px;
+}
+
+#ticket_form .other.showing {
+    margin-top: 5px;
+    height: auto;
+    border-width: 1px;
+}
+
+#output {
+    border: 1px solid black;
+    opacity: 0;
+    transition: all 0.3s ease;
+
+}
+
+#output.failure {
+    color: red;
+    opacity: 1;
+    border-color: #ffaaaa;
+    padding: 10px;
+    margin: 20px 20px;
+}
+
+#output.success {
+    color: green;
+    opacity: 1;
+    border-color: #aaffaa;
+    padding: 10px;
+    margin: 20px 20px;
+}
+
 #output label {
+    font-family: sans-serif;
     display: block;
     text-align: center;
+}
+
+button {
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#ticket_panel {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 500px;
+    border: 1px solid lightgray;
+}
+
+#ticket_list {
+    overflow: hidden;
+    border-right: 1px solid gray;
+}
+
+#ticket_list select {
+    width: 220px;
+    overflow-y: scroll;
+    height: 100%;
+    font-size: 24px;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+#ticket_list select option {
+    cursor: pointer;
+}
+
+h1.customer_name h4 {
+    margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
 }

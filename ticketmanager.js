@@ -56,18 +56,34 @@ class TicketManager {
         updateTemplates();
     }
 
-    getUserTemplate(type) {
-        return getUserTemplate(type);
+    getTemplate(type) {
+        return getTemplate(type);
+    }
+
+    getUserTemplate(type, nonce) {
+        return Object.assign(getUserTemplate(type), {
+            nonce: nonce
+        });
     }
 
     getTicketList() {
-        this.ticketList = fs.readdirSync("tickets/open");
-        this.ticketList.push(...fs.readdirSync("tickets/closed"));
+        this.ticketList = {};
+        this.ticketList["open"] = fs.readdirSync("tickets/open");
+        this.ticketList["closed"] = fs.readdirSync("tickets/closed");
         let max = this.lastTicket;
-        for (let ticket of this.ticketList) {
-            let num = parseInt(ticket.substr(1));
-            if (num > max) max = num;
+        let maxOpen = 0;
+        let maxClosed = 0;
+        let i = this.ticketList["open"].length - 1;
+        if (i >= 0) {
+            maxOpen = parseInt(this.ticketList["open"][i].substr(1));
         }
+        i = this.ticketList["closed"].length - 1;
+
+        if (i >= 0) {
+            maxClosed = parseInt(this.ticketList["closed"][i].substr(1));
+        }
+
+        max = Math.max(max, maxOpen, maxClosed);
         this.lastTicket = max;
     }
 
@@ -90,15 +106,7 @@ class TicketManager {
     }
 
     genTicketNumber(type) {
-        let prefix = "K";
-        switch (type) {
-            case CONTACT:
-                prefix = "C";
-                break;
-            case QUEST:
-                prefix = "Q";
-                break;
-        }
+        let prefix = this.getTemplate(type).letter_code.data;
         this.lastTicket += 10;
         this.lastTicket = Math.floor(this.lastTicket / 10) * 10;
         this.lastTicket += Math.floor(Math.random() * 10);
@@ -114,7 +122,7 @@ class TicketManager {
 
             verify.data.id = id;
 
-            let ticket = new Ticket(id, verify.data);
+            let ticket = new Ticket(id, verify.data, type);
             this.tickets[id] = ticket;
             return id;
         } else {
