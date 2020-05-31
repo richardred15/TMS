@@ -3,7 +3,7 @@
 ## Ticket Management System
 Allow users to create tickets (contact forms) using simple templates
 
-```json
+```javascript
     "method": {
         "type": "text/message/(selection)/phone/email/password",
         "options": {
