@@ -1,0 +1,105 @@
+{
+    "default": {
+        "status": {
+            "type": "selection",
+            "disabled": false,
+            "options": {
+                "read": "read",
+                "unread": "unread",
+                "awaiting": "awaiting",
+                "closed": "closed"
+            },
+            "id": "ticket_status",
+            "internal": true
+        },
+        "notes": {
+            "type": "message",
+            "id": "ticket_notes",
+            "internal": true
+        },
+        "posted": {
+            "type": "text",
+            "disabled": true,
+            "internal": true
+        },
+        "comments": {
+            "type": "message",
+            "disabled": true
+        },
+
+        "name": {
+            "type": "text",
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "required": true
+        },
+        "phone": {
+            "type": "phone"
+        },
+        "method": {
+            "type": "selection",
+            "options": {
+                "Email": "Email",
+                "Text": "Text",
+                "Call": "Call"
+            }
+        },
+        "best_time": {
+            "type": "selection",
+            "options": {
+                "Morning": "Morning",
+                "Afternoon": "Afternoon",
+                "Evening": "Evening",
+                "Anytime": "Anytime",
+                "Other": "Other"
+            }
+        }
+    },
+    "contact": {
+
+    },
+    "questionnaire": {
+        "use_case": {
+            "type": "selection",
+            "options": {
+                "Gaming": "Gaming",
+                "Office": "Office",
+                "Video Editing": "Video Editing",
+                "Other": "Other"
+            }
+        },
+        "rgb_preference": {
+            "type": "selection",
+            "options": {
+                "Doesn't Matter": "Doesn't Matter",
+                "No RGB for Me": "No RGB for Me",
+                "I love Vegas": "I love Vegas"
+            }
+        },
+        "brand_preference": {
+            "type": "selection",
+            "options": {
+                "Doesn't Matter": "Doesn't Matter",
+                "Yes": "Yes"
+            }
+        },
+        "upgradability": {
+            "type": "selection",
+            "options": {
+                "New Parts": "New Parts",
+                "New Computer": "New Computer"
+            }
+        },
+        "tier": {
+            "type": "selection",
+            "options": {
+                "tier1": "$15 - Build Review",
+                "tier2": "$25 - Part Selection",
+                "tier3": "$35 - PC Build",
+                "tier4": "$50 - Everything"
+            }
+        }
+    }
+}
