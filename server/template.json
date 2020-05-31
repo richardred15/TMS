@@ -1,6 +1,7 @@
 {
     "default": {
         "letter_code": {
+            "hidden": true,
             "data": "K",
             "internal": true
         },
@@ -75,12 +76,14 @@
     },
     "contact": {
         "letter_code": {
+            "hidden": true,
             "data": "C",
             "internal": true
         }
     },
     "questionnaire": {
         "letter_code": {
+            "hidden": true,
             "data": "Q",
             "internal": true
         },

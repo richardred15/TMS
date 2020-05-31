@@ -30,12 +30,21 @@ io.on('connection', function (socket) {
         admin = true;
     }
     socket.on('user_template', function (data) {
-        expected = nonce;
-        console.log(expected);
-        socket.emit('user_template', {
-            data: tm.getUserTemplate(data.type, nonce)
-        });
-        nonce = getNONCE();
+        let template = tm.getUserTemplate(data.type, nonce);
+        if (template) {
+            expected = nonce;
+
+            socket.emit('user_template', {
+                data: template
+            });
+            nonce = getNONCE();
+        } else {
+            socket.emit('user_template', {
+                data: {
+                    "error": "No such form"
+                }
+            });
+        }
     });
 
     socket.on('submit_user', function (data) {
@@ -56,14 +65,16 @@ io.on('connection', function (socket) {
     });
 
     socket.on('admin_update_ticket', function (data) {
-        let ticket = tm.getTicket(data.id);
-        let template = tm.getTemplate(data.type);
-        for (let item in data.data) {
-            console.log(item);
-            if (!template[item] || !template[item].disabled)
-                ticket.data[item] = data.data[item];
+        if (admin) {
+            let ticket = tm.getTicket(data.id);
+            let template = tm.getTemplate(data.type);
+            for (let item in data.data) {
+                console.log(item);
+                if (!template[item] || !template[item].disabled)
+                    ticket.data[item] = data.data[item];
+            }
+            tm.updateTicket(data.id);
         }
-        ticket.save();
     });
 
     socket.on('admin_get_display_data', function (data) {
@@ -87,6 +98,7 @@ io.on('connection', function (socket) {
         if (admin) {
             socket.emit('admin_templates', {
                 data: {
+                    "default": tm.getTemplate("default"),
                     "contact": tm.getTemplate("contact"),
                     "questionnaire": tm.getTemplate("questionnaire")
                 }

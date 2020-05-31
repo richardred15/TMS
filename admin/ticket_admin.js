@@ -115,7 +115,9 @@ class TicketAdmin {
 
     populateDisplay(type) {
         this.ticket_container.innerHTML = "";
-        this.ticket_container.appendChild(this.generateForm(this.form_templates[type]));
+        if (type == "unknown") type = "default";
+        let form = this.generateForm(this.form_templates[type]);
+        this.ticket_container.appendChild(form);
     }
 
     getTicket(id) {
@@ -134,6 +136,7 @@ class TicketAdmin {
     }
 
     generateForm(template) {
+        console.log(template);
         this.action_container = document.createElement("div");
         this.action_container.id = "action_container";
         this.output = document.createElement("div");
@@ -154,6 +157,7 @@ class TicketAdmin {
         this.form.setAttribute("onsubmit", "return false;");
         this.form.id = "ticket_form";
         for (let item in template) {
+            if (template[item].hidden) continue;
             let itemDiv = document.createElement("div");
             let itemLabel = document.createElement("label");
             itemLabel.innerHTML = template[item].label ? template[item].label : item;

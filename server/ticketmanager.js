@@ -14,22 +14,26 @@ function updateTemplates() {
 
 function getTemplate(type) {
     if (template_cache[type] == undefined) {
-        let def = Object.assign({}, templates[DEFAULT]);
-        let obj = Object.assign(def, templates[type]);
-        let sorted = {};
-        let sortable = [];
-        for (let item in obj) {
-            sortable.push([item, obj[item].priority]);
-        }
-        sortable.sort(function (a, b) {
-            return a[1] - b[1];
-        });
-        sortable.forEach(function (item) {
-            sorted[item[0]] = obj[item[0]];
-        });
+        if (templates[type] !== undefined) {
+            let def = Object.assign({}, templates[DEFAULT]);
+            let obj = Object.assign(def, templates[type]);
+            let sorted = {};
+            let sortable = [];
+            for (let item in obj) {
+                sortable.push([item, obj[item].priority]);
+            }
+            sortable.sort(function (a, b) {
+                return a[1] - b[1];
+            });
+            sortable.forEach(function (item) {
+                sorted[item[0]] = obj[item[0]];
+            });
 
-        template_cache[type] = sorted;
-        return sorted;
+            template_cache[type] = sorted;
+            return sorted;
+        } else {
+            return false;
+        }
     } else {
         return template_cache[type];
     }
@@ -37,11 +41,15 @@ function getTemplate(type) {
 
 function getUserTemplate(type) {
     let template = getTemplate(type);
-    let temp = {};
-    for (let item in template) {
-        if (!template[item].internal) temp[item] = template[item];
+    if (template) {
+        let temp = {};
+        for (let item in template) {
+            if (!template[item].internal) temp[item] = template[item];
+        }
+        return temp;
+    } else {
+        return false;
     }
-    return temp;
 }
 
 class TicketManager {
@@ -61,30 +69,42 @@ class TicketManager {
     }
 
     getUserTemplate(type, nonce) {
-        return Object.assign(getUserTemplate(type), {
-            nonce: nonce
-        });
+        let template = getUserTemplate(type);
+        if (template) {
+            return Object.assign(template, {
+                nonce: nonce
+            });
+        } else {
+            return false;
+        }
     }
 
     getTicketList() {
         this.ticketList = {};
-        this.ticketList["open"] = fs.readdirSync("tickets/open");
-        this.ticketList["closed"] = fs.readdirSync("tickets/closed");
+        let files = fs.readdirSync("tickets/open");
+        files.sort(function (a, b) {
+            return parseInt(b.substr(1)) - parseInt(a.substr(1));
+        });
+        this.ticketList["open"] = files;
+        files = fs.readdirSync("tickets/closed");
+        files.sort(function (a, b) {
+            return parseInt(b.substr(1)) - parseInt(a.substr(1));
+        });
+        this.ticketList["closed"] = files;
         let max = this.lastTicket;
         let maxOpen = 0;
         let maxClosed = 0;
-        let i = this.ticketList["open"].length - 1;
-        if (i >= 0) {
-            maxOpen = parseInt(this.ticketList["open"][i].substr(1));
+        if (this.ticketList.open.length > 0) {
+            maxOpen = parseInt(this.ticketList["open"][0].substr(1));
         }
-        i = this.ticketList["closed"].length - 1;
 
-        if (i >= 0) {
-            maxClosed = parseInt(this.ticketList["closed"][i].substr(1));
+        if (this.ticketList.closed.length > 0) {
+            maxClosed = parseInt(this.ticketList["closed"][0].substr(1));
         }
 
         max = Math.max(max, maxOpen, maxClosed);
         this.lastTicket = max;
+        console.log(max, maxOpen, maxClosed);
     }
 
     getTicket(id) {
@@ -113,6 +133,16 @@ class TicketManager {
         return prefix + this.lastTicket.toString();
     }
 
+    updateTicket(id) {
+        let ticket = this.getTicket(id);
+        if (ticket.open && ticket.data.status == "closed") {
+            this.ticketList.closed.push(id);
+            this.ticketList.open.splice(this.ticketList.open.indexOf(id), 1);
+        }
+        console.log(this.ticketList.closed);
+        ticket.update();
+    }
+
     newTicket(data, type) {
         let template = getTemplate(type);
         let verify = this.verifyTicket(data, template);
@@ -123,6 +153,7 @@ class TicketManager {
             verify.data.id = id;
 
             let ticket = new Ticket(id, verify.data, type);
+            this.ticketList.open.unshift(id);
             this.tickets[id] = ticket;
             return id;
         } else {

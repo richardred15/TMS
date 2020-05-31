@@ -43,9 +43,24 @@ class TicketClient {
 
     updatePage(data) {
         this.form_container.innerHTML = "";
-        this.nonce = data.data.nonce;
-        delete(data.data.nonce);
-        this.form_container.appendChild(this.generateForm(data.data));
+
+        if (!data.data.error) {
+            this.nonce = data.data.nonce;
+            delete(data.data.nonce);
+            this.form_container.appendChild(this.generateForm(data.data));
+        } else {
+            let form = document.createElement("form");
+            form.id = "ticket_form";
+            let error = document.createElement("div");
+            let label = document.createElement("label");
+            label.innerHTML = "Error";
+            let info = document.createElement("div");
+            info.innerHTML = data.data.error;
+            error.appendChild(label);
+            error.appendChild(info);
+            form.appendChild(error);
+            this.form_container.appendChild(form);
+        }
     }
 
     handleResult(data) {

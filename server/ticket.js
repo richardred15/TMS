@@ -67,6 +67,13 @@ class Ticket {
         return true;
     }
 
+    update() {
+        if (this.open && this.data.status == "closed") {
+            this.close();
+        }
+        this.save();
+    }
+
     save() {
 
         fs.writeFileSync(this.path() + this.id, JSON.stringify(this.data));
