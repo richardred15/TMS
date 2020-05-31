@@ -3,6 +3,7 @@ let TicketManager = require("./ticketmanager");
 var https = require('https');
 var fs = require('fs');
 var md5 = require("md5");
+var bcrypt = require("bcrypt");
 let options = {
     key: fs.readFileSync('/etc/letsencrypt/live/richard.works/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/richard.works/cert.pem'),
@@ -12,6 +13,14 @@ let options = {
 var app = https.createServer(options, handler);
 var io = require('socket.io')(app);
 app.listen(3009);
+
+process.stdin.on("data", function (data) {
+    let input = data.toString();
+    let cmd = input.split(" ")[0];
+    switch (cmd) {
+
+    }
+});
 
 fs.watchFile("template.json", {}, function (event) {
     tm.updateTemplates();
