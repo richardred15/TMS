@@ -8,7 +8,7 @@ Allow users to create tickets (contact forms) using simple templates
 ```javascript
     "form_type":{
         "form_field": {
-            "type": "text/message/(selection)/phone/email/password",
+            "type": "text/message/[selection]/phone/email/password",
             "options": {
                 "Email": "Email",
                 "Text": "Text",
