@@ -13,6 +13,16 @@
 
 <body>
     <div id="ticket_panel">
+        <div id="nav">
+            <ul>
+                <li onclick="TA.newTicket()">New Ticket</li>
+                <li>Close Ticket</li>
+            </ul>
+        </div>
+        <div id="ticket_tabs">
+            <div onclick="TA.requestOpenDisplayData()" class="tab open selected">Open</div>
+            <div onclick="TA.requestClosedDisplayData()" class="tab closed">Closed</div>
+        </div>
         <div id="ticket_list"></div>
         <div id="ticket"></div>
     </div>

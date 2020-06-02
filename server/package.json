@@ -19,6 +19,7 @@
   "homepage": "https://github.com/richardred15/TMS#readme",
   "dependencies": {
     "bcrypt": "^4.0.1",
+    "crypto": "^1.0.1",
     "md5": "^2.2.1",
     "simple-ffdb": "^0.1.2",
     "socket.io": "^2.3.0"

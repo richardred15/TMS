@@ -1,4 +1,5 @@
 let fs = require("fs");
+let Encryption = require("./encryption");
 
 class Ticket {
     constructor(id, data, type = "unknown") {
@@ -52,7 +53,9 @@ class Ticket {
     load() {
         if (fs.existsSync("tickets/closed/" + this.id)) this.open = false;
         else if (!fs.existsSync("tickets/open/" + this.id)) return false;
-        this.data = JSON.parse(fs.readFileSync(this.path() + this.id));
+        let data = fs.readFileSync(this.path() + this.id);
+        data = Encryption.decrypt(data);
+        this.data = JSON.parse(data);
         if (this.type == "unknown") {
             let idKey = this.id.substr(0, 1);
             switch (idKey) {
@@ -61,6 +64,9 @@ class Ticket {
                     break;
                 case "Q":
                     this.type = "questionnaire";
+                    break;
+                case "A":
+                    this.type = "admin";
                     break;
             }
         }
@@ -71,12 +77,21 @@ class Ticket {
         if (this.open && this.data.status == "closed") {
             this.close();
         }
-        this.save();
+        return this.save();
     }
 
     save() {
-
-        fs.writeFileSync(this.path() + this.id, JSON.stringify(this.data));
+        try {
+            let data = JSON.stringify(this.data);
+            data = Encryption.encrypt(data);
+            console.log("Save Data:");
+            console.log(data);
+            fs.writeFileSync(this.path() + this.id, data);
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false
+        }
     }
 }
 

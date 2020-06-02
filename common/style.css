@@ -16,6 +16,11 @@
     padding: 0px;
 }
 
+#ticket_form .outdated {
+    border-color: red;
+    background-color: #ffdddd;
+}
+
 #action_container {
     margin: auto;
 }
@@ -30,6 +35,11 @@
     margin: 10px 0px;
     display: block;
     text-transform: capitalize;
+}
+
+#ticket_panel label.small {
+    font-size: 12px;
+    display: inline-block;
 }
 
 #ticket_form input {
@@ -74,6 +84,7 @@
 }
 
 #ticket_form select {
+    padding-top: 3px;
     width: 100%;
     font-size: 24px;
     height: 30px;
@@ -114,7 +125,9 @@
     opacity: 1;
     border-color: #aaffaa;
     padding: 10px;
-    margin: 20px 20px;
+    margin: auto auto;
+    max-width: 450px;
+    width: 95%;
 }
 
 #output label {
@@ -131,30 +144,147 @@ button {
 
 #ticket_panel {
     display: grid;
+    grid-template-rows: 50px 35px 1fr;
     grid-template-columns: 200px 1fr;
     min-height: 500px;
     border: 1px solid lightgray;
+    font-family: sans-serif;
+    border-radius: 5px 5px 10px 10px;
+    overflow: hidden;
+    border-bottom: 7px solid rgb(36, 36, 36);
+    margin: auto;
+    width: 95%;
+    max-width: 900px;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.4);
+}
+
+#ticket_panel.client {
+    grid-template-columns: none;
+    grid-template-rows: none;
+    padding-bottom: 20px;
+    padding-top: 40px;
+    position: relative;
+}
+
+#ticket_panel.client:before {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 45px;
+    background-color: rgb(36, 36, 36);
+    width: 100%;
+}
+
+#nav {
+    grid-row: 1;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    background-color: rgb(36, 36, 36);
+}
+
+#nav ul {
+    list-style-type: none;
+    margin-block-start: 0px;
+    padding-inline-start: 10px;
+    margin: 0px;
+    display: none;
+}
+
+#nav ul.logged_in {
+    display: block;
+}
+
+#nav ul li {
+    display: inline-block;
+    padding: 15px 10px;
+    color: white;
+    cursor: pointer;
+}
+
+#ticket {
+    grid-row-start: 2;
+    grid-row-end: 4;
+    padding-bottom: 20px;
+}
+
+#ticket_tabs {
+    border-right: 1px solid gray;
+    position: relative;
+    z-index: 2;
+}
+
+
+
+#ticket_tabs .tab {
+    background-color: white;
+    display: inline-block;
+    padding: 5px 10px;
+    margin-top: 10px;
+    font-size: 12px;
+    border-color: gray;
+    border-style: solid;
+    border-width: 1px 0px 1px 1px;
+    float: right;
+    cursor: pointer;
+    display: none;
+
+}
+
+#ticket_tabs.logged_in .tab {
+    display: block;
+}
+
+#ticket_tabs .tab.selected {
+    border-bottom: 0px;
+    margin-top: 11px;
 }
 
 #ticket_list {
+    grid-row: 3;
     overflow: hidden;
     border-right: 1px solid gray;
 }
 
-#ticket_list select {
-    width: 220px;
+#ticket_list>div {
+    overflow: hidden;
     overflow-y: scroll;
+    height: 500px;
+    min-height: 100%;
+    width: 220px;
+}
+
+#ticket_list>div>div {
+    width: 220px;
+
     height: 100%;
     font-size: 24px;
     border: none;
-    outline: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+    border-top: 1px solid grey;
+
 }
 
-#ticket_list select option {
+#ticket_list>div>div .option {
     cursor: pointer;
+    padding: 5px 5px;
+}
+
+#ticket_list>div>div .option.unread {
+    background-color: #ffaaaa;
+}
+
+#ticket_list>div>div .option.read {
+    background-color: #ddddff;
+}
+
+#ticket_list>div>div .option.awaiting {
+    background-color: #ffffaa;
+}
+
+#ticket_list>div>div .option.selected {
+    background-color: #f26522;
+    font-weight: bold;
+    color: white;
 }
 
 h1.customer_name h4 {

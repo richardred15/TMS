@@ -57,12 +57,33 @@ function getNONCE() {
     return md5((new Date()).toString() + "salajsdfghagha;lksjdglaksjfat");
 }
 
+let admins = [];
+
+function informAdmins(ticket_id) {
+    let ticket = tm.getTicket(ticket_id);
+    console.log(admins, ticket);
+    if (ticket) {
+        for (let admin of admins) {
+            io.sockets.to(admin).emit('ticket_update', {
+                id: ticket_id,
+                data: ticket.data
+            })
+        }
+    }
+}
+
 io.on('connection', function (socket) {
     console.log("CONNECTED");
     let nonce = getNONCE();
     let expected;
     let admin = false;
     let user = false;
+
+    socket.on('disconnect', function (data) {
+        if (admin) {
+            admins.splice(admins.indexOf(socket.id), 1);
+        }
+    });
 
     socket.on('login', function (data) {
         user = new User(data.username, data.password);
@@ -73,6 +94,9 @@ io.on('connection', function (socket) {
 
         } else {
             admin = user.isAdmin();
+            if (admin) {
+                admins.push(socket.id);
+            }
             status = "success";
             message = "Logged in Successfully!";
         }
@@ -102,13 +126,16 @@ io.on('connection', function (socket) {
 
     socket.on('submit_user', function (data) {
         console.log(data.nonce, expected);
-        if (data.nonce == expected) {
+        if (data.nonce == expected || admin) {
             let result = tm.newTicket(data.data, data.type);
             socket.emit('result_user', {
                 result: typeof result == "string" ? "success" : "failure",
                 data: result
             });
-            if (typeof result == "string") socket.disconnect();
+            if (typeof result == "string") {
+                informAdmins(result);
+                if (!admin) socket.disconnect();
+            }
         } else {
             socket.emit('result_user', {
                 result: "failure",
@@ -127,6 +154,20 @@ io.on('connection', function (socket) {
                     ticket.data[item] = data.data[item];
             }
             tm.updateTicket(data.id);
+            informAdmins(data.id);
+        }
+    });
+
+    socket.on('admin_update_notes', function (data) {
+        if (admin) {
+            console.log(data);
+            let ticket = tm.getTicket(data.id);
+            ticket.data.notes = data.notes;
+            let success = tm.updateTicket(data.id);
+            informAdmins(data.id);
+            socket.emit('note_update_status', {
+                status: success ? "success" : "failure"
+            });
         }
     });
 
@@ -150,11 +191,7 @@ io.on('connection', function (socket) {
     socket.on('admin_templates', function (data) {
         if (admin) {
             socket.emit('admin_templates', {
-                data: {
-                    "default": tm.getTemplate("default"),
-                    "contact": tm.getTemplate("contact"),
-                    "questionnaire": tm.getTemplate("questionnaire")
-                }
+                data: tm.getAllTemplates()
             });
         }
     });
@@ -163,6 +200,11 @@ io.on('connection', function (socket) {
         if (admin) {
             let id = data.id;
             let d = tm.getTicket(id);
+            if (d.data.status == "unread") {
+                d.data.status = "read";
+                tm.updateTicket(id);
+                informAdmins(data.id);
+            }
             socket.emit('admin_ticket_data', {
                 id: id,
                 data: d.data,
@@ -172,6 +214,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('admin_list_all', function (data) {
+        console.log("Ticket List", tm.ticketList);
+
         if (admin) {
             socket.emit('list_all', {
                 data: tm.ticketList

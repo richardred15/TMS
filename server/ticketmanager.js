@@ -64,6 +64,14 @@ class TicketManager {
         updateTemplates();
     }
 
+    getAllTemplates() {
+        let out = {};
+        for (let type in templates) {
+            out[type] = getTemplate(type);
+        }
+        return out;
+    }
+
     getTemplate(type) {
         return getTemplate(type);
     }
@@ -104,7 +112,6 @@ class TicketManager {
 
         max = Math.max(max, maxOpen, maxClosed);
         this.lastTicket = max;
-        console.log(max, maxOpen, maxClosed);
     }
 
     getTicket(id) {
@@ -139,8 +146,7 @@ class TicketManager {
             this.ticketList.closed.push(id);
             this.ticketList.open.splice(this.ticketList.open.indexOf(id), 1);
         }
-        console.log(this.ticketList.closed);
-        ticket.update();
+        return ticket.update();
     }
 
     newTicket(data, type) {

@@ -116,9 +116,10 @@ class TicketClient {
             parent.submitForm();
         };
         this.submit_button.innerHTML = "Submit";
-        this.action_container.appendChild(this.output);
         this.action_container.appendChild(this.submit_button);
         let formDiv = document.createElement("div");
+        formDiv.id = "ticket_panel";
+        formDiv.className = "client";
         this.form = document.createElement("form");
         this.form.setAttribute("onsubmit", "return false;");
         this.form.id = "ticket_form";
@@ -162,6 +163,7 @@ class TicketClient {
             }
             this.form.appendChild(itemDiv);
         }
+        formDiv.appendChild(this.output);
         formDiv.appendChild(this.form);
         formDiv.appendChild(this.action_container);
         return formDiv;

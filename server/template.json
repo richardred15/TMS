@@ -70,7 +70,7 @@
         },
         "comments": {
             "type": "message",
-            "disabled": true,
+            "disabled": false,
             "priority": 99
         }
     },
@@ -78,6 +78,13 @@
         "letter_code": {
             "hidden": true,
             "data": "C",
+            "internal": true
+        }
+    },
+    "admin": {
+        "letter_code": {
+            "hidden": true,
+            "data": "A",
             "internal": true
         }
     },
