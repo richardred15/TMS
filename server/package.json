@@ -20,6 +20,7 @@
   "dependencies": {
     "bcrypt": "^4.0.1",
     "md5": "^2.2.1",
-    "socketio": "^1.0.0"
+    "simple-ffdb": "^0.1.2",
+    "socket.io": "^2.3.0"
   }
 }

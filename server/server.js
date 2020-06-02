@@ -4,6 +4,8 @@ var https = require('https');
 var fs = require('fs');
 var md5 = require("md5");
 var bcrypt = require("bcrypt");
+let User = require("./user");
+
 let options = {
     key: fs.readFileSync('/etc/letsencrypt/live/richard.works/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/richard.works/cert.pem'),
@@ -15,10 +17,35 @@ var io = require('socket.io')(app);
 app.listen(3009);
 
 process.stdin.on("data", function (data) {
-    let input = data.toString();
-    let cmd = input.split(" ")[0];
+    let input = data.toString().trim();
+    let parts = input.split(" ");
+    let cmd = parts.length > 0 ? parts[0] : input;
     switch (cmd) {
-
+        case "new":
+            if (parts.length > 1) {
+                bcrypt.hash(parts[1], 10, function (err, hash) {
+                    if (err) {
+                        return err;
+                    } else {
+                        console.log(hash);
+                    }
+                });
+            } else {
+                console.log("Invalid command options");
+            }
+            break;
+        case "test":
+            if (parts.length > 2) {
+                let pass = parts[1];
+                let hash = parts[2];
+                bcrypt.compare(pass, hash, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log(result);
+                    }
+                });
+            }
     }
 });
 
@@ -35,9 +62,26 @@ io.on('connection', function (socket) {
     let nonce = getNONCE();
     let expected;
     let admin = false;
-    if (socket.handshake.address == "::ffff:35.133.9.238") {
-        admin = true;
-    }
+    let user = false;
+
+    socket.on('login', function (data) {
+        user = new User(data.username, data.password);
+        console.log(user);
+        let status = "failed";
+        let message = "Login Failed";
+        if (user.logged_in === false) {
+
+        } else {
+            admin = user.isAdmin();
+            status = "success";
+            message = "Logged in Successfully!";
+        }
+        socket.emit('login', {
+            status: status,
+            message: message
+        });
+    });
+
     socket.on('user_template', function (data) {
         let template = tm.getUserTemplate(data.type, nonce);
         if (template) {

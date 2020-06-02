@@ -16,8 +16,30 @@ class TicketAdmin {
         }
         this.internal_list = {};
         this.connect();
-        this.requestListAll();
-        this.requestTemplate();
+        this.showLogin();
+
+    }
+
+    showLogin() {
+        let loginForm = document.createElement("form");
+        loginForm.id = "ticket_form";
+        loginForm.setAttribute('onsubmit', 'return false;');
+        let html = `
+            <label>Username:</label><input type="text" name="username" />
+            <label>Password:</label><input type="password" name="password" />
+            <button onclick='TA.login()'>Login</button>
+        `;
+        loginForm.innerHTML = html;
+        this.ticket_container.appendChild(loginForm);
+    }
+
+    login() {
+        let username = this.ticket_container.querySelector("[name=username]").value;
+        let password = this.ticket_container.querySelector("[name=password]").value;
+        this.socket.emit('login', {
+            username: username,
+            password: password
+        });
     }
 
     updateTicket() {
@@ -63,6 +85,17 @@ class TicketAdmin {
 
         this.socket.on('admin_display_data', function (data) {
             parent.handleDisplayData(data);
+        });
+
+        this.socket.on('login', function (data) {
+            console.log(data);
+            if (data.status === "success") {
+                parent.ticket_container.innerHTML = "";
+                parent.requestListAll();
+                parent.requestTemplate();
+            } else {
+                alert(data.message);
+            }
         });
     }
 
