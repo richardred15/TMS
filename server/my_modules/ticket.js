@@ -1,5 +1,6 @@
 let fs = require("fs");
 let Encryption = require("./encryption");
+let CallManager = require("./callmanager");
 
 class Ticket {
     constructor(id, data, type = "unknown") {
@@ -9,7 +10,7 @@ class Ticket {
         this.type = type;
         this.fulltext = "";
         this.fulltext_items = ["name", "email", "phone", "notes", "comments", "id", "user_id"];
-
+        this.call_manager = new CallManager(this.id);
         if (data !== undefined) {
             this.data = data;
             this.data.posted = (new Date()).toString();
@@ -19,6 +20,22 @@ class Ticket {
         } else {
             this.loaded = this.load();
         }
+    }
+
+    startCall() {
+        let call = this.call_manager.newCall();
+        console.log(call);
+    }
+
+    endCall(id) {
+        let call = this.call_manager.getCall(id);
+        if (call) {
+            call.endCall();
+        }
+    }
+
+    getCallControls() {
+        return this.call_manager.generateControls();
     }
 
     setClosed() {
@@ -103,8 +120,11 @@ class Ticket {
 
     generateFulltext() {
         this.fulltext = "";
+        console.log(this.data);
         for (let item of this.fulltext_items) {
-            this.fulltext += this.data[item].toString();
+            if (this.data[item]) {
+                this.fulltext += this.data[item].toString();
+            }
         }
     }
 

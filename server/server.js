@@ -149,6 +149,20 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('start_call', function (data) {
+        let ticket = tm.getTicket(data.ticket);
+        if (ticket) {
+            ticket.startCall();
+        }
+    });
+
+    socket.on('end_call', function (data) {
+        let ticket = tm.getTicket(data.ticket);
+        if (ticket) {
+            ticket.endCall(data.call);
+        }
+    });
+
     socket.on('admin_nonce', function (data) {
         if (admin) {
             let ticket = tm.getTicket(data.ticket);
@@ -227,7 +241,8 @@ io.on('connection', function (socket) {
             socket.emit('admin_ticket_data', {
                 id: id,
                 data: d.data,
-                type: d.type
+                type: d.type,
+                call_controls: d.getCallControls()
             });
         }
     });

@@ -476,6 +476,7 @@ class TicketAdmin {
         setTimeout(function () {
             this.ticket_panel.className = "";
         }, 500);
+        this.form.innerHTML = data.call_controls + this.form.innerHTML;
         this.setSelectedOption(data.data.id);
     }
 

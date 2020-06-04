@@ -36,10 +36,36 @@
 }
 
 #ticket_form label {
-    margin: 10px 0px;
-    color: #ddd;
+    margin: 10px 0px 0px 0px;
+    color: #fff;
     display: block;
     text-transform: capitalize;
+}
+
+::-webkit-input-placeholder {
+    /* Edge */
+    color: #a1c0ff;
+    text-transform: capitalize;
+    font-size: 18px;
+    line-height: 24px;
+
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #a1c0ff;
+    text-transform: capitalize;
+    font-size: 18px;
+    line-height: 24px;
+
+}
+
+::placeholder {
+    color: #a1c0ff;
+    text-transform: capitalize;
+    font-size: 18px;
+    line-height: 24px;
+    ;
 }
 
 #ticket_panel label.small {
@@ -108,6 +134,64 @@
     right: 12px;
     position: absolute;
     cursor: pointer;
+}
+
+#ticket .call_control {
+    position: relative;
+}
+
+#ticket .call_control .time {
+    display: inline-block;
+}
+
+#ticket .call_info {
+    padding-bottom: 25px;
+}
+
+#ticket .call_info .info {
+    display: inline-block;
+}
+
+#ticket .call_control button {
+    color: black;
+    background-color: white;
+    position: relative;
+    border: none;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border-radius: 0px;
+}
+
+#ticket .call_control .call {
+    margin-top: 10px;
+    padding: 5px 0px;
+    border: 1px solid white;
+    border-width: 1px 0px 1px 0px;
+}
+
+#ticket .call_control .end {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+#ticket .call_control .id {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#ticket .drop_down {
+    height: 140px;
+    max-height: 34px;
+    overflow: hidden;
+    padding: 5px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+#ticket .drop_down.showing {
+    max-height: 1200px;
 }
 
 #ticket_form #cancel_button {

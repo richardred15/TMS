@@ -156,6 +156,7 @@ class TicketClient {
             let itemLabel = document.createElement("label");
             itemLabel.innerHTML = template[item].label ? template[item].label : item;
             let itemInput = document.createElement(this.type_elements[template[item].type]);
+            itemInput.placeholder = itemLabel.innerHTML;
             itemInput.name = item;
             if (template[item].type == "selection") {
                 for (let opt in template[item].options) {

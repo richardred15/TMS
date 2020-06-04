@@ -1,4 +1,5 @@
 let Ticket = require("./ticket");
+let CallManager = require("./callmanager");
 var fs = require('fs');
 const CONTACT = "contact";
 const QUEST = "questionnaire";

@@ -32,6 +32,15 @@
         <div id="loader" class="loader"></div>
     </div>
     <script>
+        function toggleClass(elm, clss) {
+            let className = elm.className;
+            if (className.indexOf(clss) == -1) {
+                className += " " + clss;
+            } else {
+                className = className.replace(clss, "").replace("  ", " ");
+            }
+            elm.className = className;
+        }
         let TA = new TicketAdmin();
     </script>
 </body>
