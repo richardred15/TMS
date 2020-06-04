@@ -1,11 +1,10 @@
-let TicketManager = require("./ticketmanager");
+let TicketManager = require("./my_modules/ticketmanager");
 
 var https = require('https');
 var fs = require('fs');
 var md5 = require("md5");
 var bcrypt = require("bcrypt");
-let User = require("./user");
-
+let User = require("./my_modules/user");
 let options = {
     key: fs.readFileSync('/etc/letsencrypt/live/richard.works/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/richard.works/cert.pem'),
@@ -53,15 +52,21 @@ fs.watchFile("template.json", {}, function (event) {
     tm.updateTemplates();
 });
 
+/**
+ * @returns {string}
+ * @description Generate a new nonce
+ */
 function getNONCE() {
     return md5((new Date()).toString() + "salajsdfghagha;lksjdglaksjfat");
 }
 
 let admins = [];
+let admin_nonces = {
+
+};
 
 function informAdmins(ticket_id) {
     let ticket = tm.getTicket(ticket_id);
-    console.log(admins, ticket);
     if (ticket) {
         for (let admin of admins) {
             io.sockets.to(admin).emit('ticket_update', {
@@ -73,7 +78,6 @@ function informAdmins(ticket_id) {
 }
 
 io.on('connection', function (socket) {
-    console.log("CONNECTED");
     let nonce = getNONCE();
     let expected;
     let admin = false;
@@ -81,13 +85,14 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function (data) {
         if (admin) {
+            console.log("ADMIN OUT");
             admins.splice(admins.indexOf(socket.id), 1);
+            if (admin_nonces[socket.id]) delete(admin_nonces[socket.id]);
         }
     });
 
     socket.on('login', function (data) {
         user = new User(data.username, data.password);
-        console.log(user);
         let status = "failed";
         let message = "Login Failed";
         if (user.logged_in === false) {
@@ -95,6 +100,7 @@ io.on('connection', function (socket) {
         } else {
             admin = user.isAdmin();
             if (admin) {
+                console.log("ADMIN IN");
                 admins.push(socket.id);
             }
             status = "success";
@@ -125,7 +131,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('submit_user', function (data) {
-        console.log(data.nonce, expected);
         if (data.nonce == expected || admin) {
             let result = tm.newTicket(data.data, data.type);
             socket.emit('result_user', {
@@ -144,12 +149,26 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('admin_nonce', function (data) {
+        if (admin) {
+            let ticket = tm.getTicket(data.ticket);
+            if (ticket) {
+                let nonce = getNONCE();
+                let packet = {
+                    ticket: data.ticket,
+                    nonce: nonce
+                }
+                admin_nonces[socket.id] = packet;
+                socket.emit('admin_nonce', packet);
+            }
+        }
+    });
+
     socket.on('admin_update_ticket', function (data) {
         if (admin) {
             let ticket = tm.getTicket(data.id);
             let template = tm.getTemplate(data.type);
             for (let item in data.data) {
-                console.log(item);
                 if (!template[item] || !template[item].disabled)
                     ticket.data[item] = data.data[item];
             }
@@ -160,7 +179,6 @@ io.on('connection', function (socket) {
 
     socket.on('admin_update_notes', function (data) {
         if (admin) {
-            console.log(data);
             let ticket = tm.getTicket(data.id);
             ticket.data.notes = data.notes;
             let success = tm.updateTicket(data.id);
@@ -179,7 +197,8 @@ io.on('connection', function (socket) {
                 out[ticket] = {
                     status: data.status,
                     name: data.name,
-                    type: tm.getTicket(ticket).type
+                    type: data.type,
+                    posted: data.posted
                 };
             }
             socket.emit('admin_display_data', {
@@ -213,8 +232,28 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('admin_search', function (data) {
+        if (admin) {
+            let matches = tm.searchTickets(data.term);
+            let result_data = [];
+            for (let match of matches) {
+                let ticket = tm.getTicket(match);
+                let packet = {
+                    id: match,
+                    name: ticket.data.name,
+                    posted: ticket.data.posted,
+                    email: ticket.data.email,
+                    phone: ticket.data.phone
+                }
+                result_data.push(packet);
+            }
+            socket.emit('search_results', {
+                results: result_data
+            });
+        }
+    });
+
     socket.on('admin_list_all', function (data) {
-        console.log("Ticket List", tm.ticketList);
 
         if (admin) {
             socket.emit('list_all', {
@@ -227,11 +266,41 @@ io.on('connection', function (socket) {
 function handler(req, res) {
     res.writeHead(200, {
         "Access-Control-Allow-Origin": "https://richard.works",
-        "Content-Type": "text/plain"
+        "Content-Type": "text/html"
     });
+    let url = new URL(req.url, `http://${req.headers.host}`);
+    if (url.pathname == "/admin/viewticket") {
+        let socket = url.searchParams.get('id');
+        let expected = admin_nonces[socket];
+        if (expected) {
+            let ticket = url.searchParams.get('ticket');
+            if (ticket == expected.ticket) {
+                let nonce = url.searchParams.get('nonce');
+                if (nonce == expected.nonce) {
+                    delete(admin_nonces[socket]);
+                    let ticket_object = tm.getTicket(ticket);
+                    let ticket_data = JSON.stringify(ticket_object);
+                    let ticket_template = JSON.stringify(tm.getTemplate(ticket_object.type))
+                    let html = fs.readFileSync("./pages/admin_view.html").toString();
+                    res.write(html.replace("'${ticket_data}'", ticket_data).replace("'${ticket_template}'", ticket_template));
+                }
+            }
+        } else {
+            res.write("Are you sure you're supposed to be here?");
+        }
+    }
+    if (url.pathname == "/viewticket") {
+        let ticket = url.searchParams.get('ticket');
+        let ticket_object = tm.getUserTicket(ticket);
+        console.log(ticket_object);
+        let ticket_data = ticket_object;
+        let ticket_template = tm.getUserTemplate(ticket_object.type);
+        res.write(JSON.stringify({
+            data: ticket_data,
+            template: ticket_template
+        }));
+    }
     res.end();
 };
 
 let tm = new TicketManager();
-
-console.log(tm.getTicket("Q13626"));

@@ -7,6 +7,8 @@ class Ticket {
         this.open = true;
         this.archived = false;
         this.type = type;
+        this.fulltext = "";
+        this.fulltext_items = ["name", "email", "phone", "notes", "comments", "id", "user_id"];
 
         if (data !== undefined) {
             this.data = data;
@@ -19,11 +21,19 @@ class Ticket {
         }
     }
 
-    close() {
+    setClosed() {
         if (this.open) {
             fs.unlinkSync("tickets/open/" + this.id);
             this.open = false;
             this.data.status = "closed";
+            this.save();
+        }
+    }
+
+    setOpen() {
+        if (!this.open) {
+            fs.unlinkSync("tickets/closed/" + this.id);
+            this.open = true;
             this.save();
         }
     }
@@ -51,6 +61,9 @@ class Ticket {
     }
 
     load() {
+        try {
+            if (fs.lstatSync("tickets/closed/" + this.id).isDirectory()) return false;
+        } catch {}
         if (fs.existsSync("tickets/closed/" + this.id)) this.open = false;
         else if (!fs.existsSync("tickets/open/" + this.id)) return false;
         let data = fs.readFileSync(this.path() + this.id);
@@ -70,22 +83,36 @@ class Ticket {
                     break;
             }
         }
+        this.generateFulltext();
         return true;
     }
 
     update() {
         if (this.open && this.data.status == "closed") {
-            this.close();
+            this.setClosed();
+        } else if (!this.open && this.data.status != "closed") {
+            this.setOpen();
         }
         return this.save();
     }
 
+    simpleMatch(term) {
+        let reg = new RegExp(`.*${term}.*`, "gi");
+        return reg.test(this.fulltext);
+    }
+
+    generateFulltext() {
+        this.fulltext = "";
+        for (let item of this.fulltext_items) {
+            this.fulltext += this.data[item].toString();
+        }
+    }
+
     save() {
         try {
+            this.generateFulltext();
             let data = JSON.stringify(this.data);
             data = Encryption.encrypt(data);
-            console.log("Save Data:");
-            console.log(data);
             fs.writeFileSync(this.path() + this.id, data);
             return true;
         } catch (e) {

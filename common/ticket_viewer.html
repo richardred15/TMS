@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://richard.works/projects/TMS/common/style.css" />
+</head>
+
+<body>
+    <div id="form_container" class="client"></div>
+    <script src="https://richard.works/projects/TMS/common/ticket_viewer.js"></script>
+
+    <script>
+        let args = {};
+        window.location.search.replace("?", "").split("&").forEach(e => {
+            let parts = e.split("=");
+            args[parts[0]] = parts[1];
+        });
+        let ticket_id = args.ticket;
+        let ticket_template = {};
+        let ticket_data = {};
+        let TC;
+        let form;
+
+        fetch("https://richard.works:3009/viewticket?ticket=" + ticket_id).then(response => response.text()).then(
+            data => {
+                data = JSON.parse(data);
+                ticket_template = data.template;
+                ticket_template.status = {
+                    type: "text",
+                    label: "Ticket Status:"
+                }
+                ticket_data = data.data;
+                setup();
+            });
+
+        function setup() {
+            let form = generateForm(ticket_template);
+            document.getElementById("form_container").appendChild(form);
+            fillForm(ticket_data);
+        }
+    </script>
+</body>
+
+</html>

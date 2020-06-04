@@ -18,11 +18,15 @@
 
 #ticket_form .outdated {
     border-color: red;
-    background-color: #ffdddd;
+    color: #ffdddd;
 }
 
 #action_container {
     margin: auto;
+}
+
+#action_container button {
+    margin-left: 5px;
 }
 
 #ticket_form,
@@ -33,6 +37,7 @@
 
 #ticket_form label {
     margin: 10px 0px;
+    color: #ddd;
     display: block;
     text-transform: capitalize;
 }
@@ -40,6 +45,14 @@
 #ticket_panel label.small {
     font-size: 12px;
     display: inline-block;
+}
+
+#ticket_panel label.timeago {
+    display: block;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 20px;
 }
 
 #ticket_form input {
@@ -52,11 +65,29 @@
     border-bottom: 1px solid rgb(197, 197, 197);
 }
 
+#ticket_form input[name=status] {
+    text-transform: uppercase;
+}
+
 #ticket_form input,
 #ticket_form textarea,
-#ticket_form select {
+#ticket_form select,
+#ticket_form option {
     max-width: 600px;
+    background-color: rgba(208, 216, 255, 0.4);
+    color: white;
+}
 
+#ticket_form input:disabled,
+#ticket_form textarea:disabled,
+#ticket_form select:disabled,
+#ticket_form option:disabled {
+    background-color: rgba(208, 216, 255, 0.1);
+    border: none;
+}
+
+#ticket_form option {
+    color: black;
 }
 
 #ticket_form textarea {
@@ -86,11 +117,12 @@
 #ticket_form select {
     padding-top: 3px;
     width: 100%;
-    font-size: 24px;
+    font-size: 22px;
     height: 30px;
     background: transparent;
     border: none;
     border-bottom: 1px solid rgb(197, 197, 197);
+    text-transform: capitalize;
 }
 
 #ticket_form .other {
@@ -109,11 +141,12 @@
     border: 1px solid black;
     opacity: 0;
     transition: all 0.3s ease;
-
+    color: red;
+    background-color: #ffcccc;
+    height: auto;
 }
 
 #output.failure {
-    color: red;
     opacity: 1;
     border-color: #ffaaaa;
     padding: 10px;
@@ -122,6 +155,7 @@
 
 #output.success {
     color: green;
+    background-color: #ccffcc;
     opacity: 1;
     border-color: #aaffaa;
     padding: 10px;
@@ -155,8 +189,14 @@ button {
     margin: auto;
     width: 95%;
     max-width: 900px;
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.4);
+
+    background: #005dba;
+    background: -moz-linear-gradient(20deg, #3586d8 0%, #00197d 100%);
+    background: -webkit-linear-gradient(20deg, #3586d8 0%, #00197d 100%);
+    background: linear-gradient(200deg, #3586d8 0%, #00197d 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3586d8', endColorstr='#00197d', GradientType=1);
 }
+
 
 #ticket_panel.client {
     grid-template-columns: none;
@@ -167,7 +207,7 @@ button {
 }
 
 #ticket_panel.client:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0px;
     left: 0px;
@@ -180,7 +220,30 @@ button {
     grid-row: 1;
     grid-column-start: 1;
     grid-column-end: 3;
-    background-color: rgb(36, 36, 36);
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#242424+0,2a2a2a+50,242424+95 */
+    background: #242424;
+    /* Old browsers */
+    background: -moz-linear-gradient(top, #242424 0%, #2a2a2a 50%, #242424 95%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #242424 0%, #2a2a2a 50%, #242424 95%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #242424 0%, #2a2a2a 50%, #242424 95%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#242424', endColorstr='#242424', GradientType=0);
+    /* IE6-9 */
+
+    position: relative;
+    z-index: 4;
+    box-shadow: 0px 2px 10px -4px rgba(0, 0, 0, 0.4);
+}
+
+#nav #search_box {
+    position: absolute;
+    right: 8px;
+    top: 9px;
+    height: 30px;
+    border: none;
+    width: 250px;
 }
 
 #nav ul {
@@ -189,6 +252,7 @@ button {
     padding-inline-start: 10px;
     margin: 0px;
     display: none;
+    margin-top: 11px;
 }
 
 #nav ul.logged_in {
@@ -197,8 +261,9 @@ button {
 
 #nav ul li {
     display: inline-block;
-    padding: 15px 10px;
+    padding: 5px 10px;
     color: white;
+    background-color: rgba(255, 255, 255, 0.3);
     cursor: pointer;
 }
 
@@ -206,28 +271,61 @@ button {
     grid-row-start: 2;
     grid-row-end: 4;
     padding-bottom: 20px;
+    position: relative;
+    color: #ddd;
+}
+
+#ticket::before {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index: 2;
+    height: 100%;
+    background-color: rgba(208, 216, 255, 0.4);
+    transition: all 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#ticket_panel.waiting #ticket::before {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#ticket>div {
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+#ticket_panel.waiting #ticket>div {
+    opacity: 0;
 }
 
 #ticket_tabs {
-    border-right: 1px solid gray;
+    background: #ea652c;
+
     position: relative;
     z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
-
-
 #ticket_tabs .tab {
-    background-color: white;
     display: inline-block;
     padding: 5px 10px;
-    margin-top: 10px;
-    font-size: 12px;
+    padding-bottom: 4px;
+    margin-top: 2px;
+    margin-right: 2px;
+    line-height: 24px;
+    margin-left: 2px;
+    font-size: 14px;
     border-color: gray;
-    border-style: solid;
-    border-width: 1px 0px 1px 1px;
     float: right;
     cursor: pointer;
     display: none;
+    text-align: center;
 
 }
 
@@ -235,15 +333,32 @@ button {
     display: block;
 }
 
-#ticket_tabs .tab.selected {
-    border-bottom: 0px;
-    margin-top: 11px;
+#ticket_tabs .selected {
+    color: white;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 #ticket_list {
     grid-row: 3;
     overflow: hidden;
-    border-right: 1px solid gray;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ea652c+0,ef4b00+100 */
+    background: #ea652c;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #ea652c 0%, #ef4b00 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #ea652c 0%, #ef4b00 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #ea652c 0%, #ef4b00 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ea652c', endColorstr='#ef4b00', GradientType=1);
+    /* IE6-9 */
+
+
+}
+
+#ticket_list .small {
+    vertical-align: middle;
 }
 
 #ticket_list>div {
@@ -256,29 +371,76 @@ button {
 
 #ticket_list>div>div {
     width: 220px;
-
+    padding-top: 2px;
     height: 100%;
-    font-size: 24px;
+    font-size: 20px;
     border: none;
-    border-top: 1px solid grey;
 
 }
 
 #ticket_list>div>div .option {
+    color: white;
     cursor: pointer;
-    padding: 5px 5px;
+    padding: 10px;
+    border-width: 0px 0px 0px 0px;
+    border-color: gray;
+    border-style: solid;
 }
 
-#ticket_list>div>div .option.unread {
-    background-color: #ffaaaa;
+#ticket_list>div>div .option .small {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
 }
 
-#ticket_list>div>div .option.read {
-    background-color: #ddddff;
+#ticket_list>div>div .option.closed {
+    display: none;
+    color: #d6d6d6;
 }
 
-#ticket_list>div>div .option.awaiting {
-    background-color: #ffffaa;
+#ticket_list>div>div .option.closed .small {
+    background-color: lightgray;
+}
+
+#ticket_list>div>div.closed .option {
+    display: none;
+}
+
+#ticket_list>div>div.closed .option.closed {
+    display: block;
+}
+
+#ticket_list>div>div .option.unread .small {
+    background-color: rgb(255, 98, 98);
+    animation: unread 2s ease-in 0s infinite;
+}
+
+@keyframes unread {
+    0% {
+        background-color: rgb(255, 98, 98);
+    }
+
+    50% {
+        background-color: rgb(255, 45, 45);
+    }
+
+    100% {
+        background-color: rgb(255, 98, 98);
+    }
+}
+
+#ticket_list>div>div .option.read .small {
+    background-color: rgb(0, 153, 255);
+    color: #fff;
+}
+
+#ticket_list>div>div .option.awaiting .small {
+    background-color: #fdf59a;
+}
+
+#ticket_list>div>div .option:hover {
+    background-color: #ff874f;
 }
 
 #ticket_list>div>div .option.selected {
@@ -287,8 +449,134 @@ button {
     color: white;
 }
 
+.search_result {
+    padding: 5px;
+    padding-left: 20px;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+}
+
+.search_result:hover {
+    background-color: #317dd0;
+}
+
+.search_result h2,
+.search_result h4 {
+    margin: 5px auto;
+}
+
 h1.customer_name h4 {
     margin: 0;
     font-size: 14px;
     text-transform: uppercase;
+}
+
+.loader {
+    color: #ffffff;
+    font-size: 90px;
+    text-indent: -9999em;
+    overflow: hidden;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    margin: 72px auto;
+    top: 200px;
+    z-index: 3;
+    left: calc((100%-300px)/2);
+    transform: translateX(50%);
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+
+    transition: all 0.3s ease;
+}
+
+#ticket_panel.waiting .loader {
+    opacity: 1;
+    pointer-events: all;
+    -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+    animation: load6 1.7s infinite ease, round 1.7s infinite ease;
+}
+
+@-webkit-keyframes load6 {
+    0% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+    }
+
+    5%,
+    95% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+    }
+
+    10%,
+    59% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+    }
+
+    20% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+    }
+
+    38% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+    }
+
+    100% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+    }
+}
+
+@keyframes load6 {
+    0% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+    }
+
+    5%,
+    95% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+    }
+
+    10%,
+    59% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+    }
+
+    20% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em, -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, -0.749em -0.34em 0 -0.477em;
+    }
+
+    38% {
+        box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em, -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, -0.82em -0.09em 0 -0.477em;
+    }
+
+    100% {
+        box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+    }
+}
+
+@-webkit-keyframes round {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes round {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
 }

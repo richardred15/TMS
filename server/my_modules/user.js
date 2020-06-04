@@ -1,4 +1,5 @@
 let bcrypt = require("bcrypt");
+let Encryption = require("./encryption");
 let fs = require("fs");
 let user_data = {
     username: "",
@@ -19,13 +20,23 @@ class User {
 
     login(username, password) {
         if (User.user_exists(username)) {
-            let data = JSON.parse(fs.readFileSync("users/" + username));
-            if (bcrypt.compareSync(password, data.password)) {
-                this.logged_in = true;
-                this.data = data;
-            } else {
+
+            try {
+                let file_data = fs.readFileSync("users/" + username);
+                let data = Encryption.decrypt(file_data).toString();
+                data = JSON.parse(data);
+                if (bcrypt.compareSync(password, data.password)) {
+                    this.logged_in = true;
+                    this.data = data;
+                    this.save();
+                } else {
+                    return false;
+                }
+            } catch (e) {
+                console.log(e);
                 return false;
             }
+
         } else {
             return false;
         }
@@ -46,7 +57,8 @@ class User {
     }
 
     save() {
-        fs.writeFileSync("users/" + this.username, JSON.stringify(this.data));
+        let data = Encryption.encrypt(JSON.stringify(this.data));
+        fs.writeFileSync("users/" + this.username, data);
     }
 
     static create(username, password, options) {

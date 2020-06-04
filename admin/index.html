@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"
         integrity="sha256-Dul4c09cdrWKXVtallPxF558lwxMwCC8dXJdZ0PVW54=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../common/style.css" />
+    <script src="timeago.js"></script>
     <script src="ticket_admin.js"></script>
 </head>
 
@@ -16,15 +17,19 @@
         <div id="nav">
             <ul>
                 <li onclick="TA.newTicket()">New Ticket</li>
-                <li>Close Ticket</li>
+                <li onclick="TA.closeTicket()">Close Ticket</li>
+                <li onclick="TA.hideTicket()">Hide Ticket</li>
+                <li onclick="TA.requestPopout()">Popout Ticket</li>
             </ul>
+            <input id="search_box" placeholder="Search" />
         </div>
         <div id="ticket_tabs">
-            <div onclick="TA.requestOpenDisplayData()" class="tab open selected">Open</div>
-            <div onclick="TA.requestClosedDisplayData()" class="tab closed">Closed</div>
+            <div onclick="TA.showOpenDisplayData()" class="tab open selected">Open</div>
+            <div onclick="TA.showClosedDisplayData()" class="tab closed">Closed</div>
         </div>
         <div id="ticket_list"></div>
         <div id="ticket"></div>
+        <div id="loader" class="loader"></div>
     </div>
     <script>
         let TA = new TicketAdmin();

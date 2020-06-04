@@ -1,5 +1,5 @@
 class TicketClient {
-    constructor(server_url = 'https://richard.works:3009') {
+    constructor(server_url = 'https://richard.works:3009', connect = true) {
         this.server_url = server_url;
         this.form_container = document.getElementById("form_container");
         this.type = this.form_container.getAttribute("type");
@@ -76,8 +76,8 @@ class TicketClient {
             this.submitted = true;
             this.form.className = "success";
             this.output.className = "success";
-            this.submit_button.style.display = "none";
-            this.output.innerHTML = `<label>Ticket Number: ${data.data}</label><label>SUCCESS</label>`;
+            this.action_container.style.display = "none";
+            this.output.innerHTML = `<label>Ticket Number: <a href="https://richard.works/projects/TMS/common/ticket_viewer.html?ticket=${data.data}">${data.data}</a></label><label>SUCCESS</label>`;
         }
     }
 
@@ -98,25 +98,53 @@ class TicketClient {
         for (var pair of form_data.entries()) {
             packet[pair[0]] = pair[1];
         }
-        this.socket.emit('submit_user', {
-            type: this.type,
-            data: packet,
-            nonce: this.nonce
-        });
+        if (this.type != "ticket_id") {
+            this.socket.emit('submit_user', {
+                type: this.type,
+                data: packet,
+                nonce: this.nonce
+            });
+        } else {
+            let url = "https://richard.works/projects/TMS/common/ticket_viewer.html?ticket=" + packet["ticket_id"];
+            window.location.href = url;
+        }
     }
 
-    generateForm(template) {
+    startViewer() {
+        let view_template = {
+            "ticket_id": {
+                type: "text",
+                label: "Ticket ID"
+            }
+        }
+
+        let form = this.generateForm(view_template, false);
+        this.type = "ticket_id";
+        this.form_container.innerHTML = "";
+        this.form_container.appendChild(form);
+    }
+
+    generateForm(template, show_view_ticket = true) {
         this.action_container = document.createElement("div");
         this.action_container.id = "action_container";
         this.output = document.createElement("div");
         this.output.id = "output";
+        if (show_view_ticket) this.view_button = document.createElement("button");
+        if (show_view_ticket) this.view_button.id = "view_button";
+        if (show_view_ticket) this.view_button.innerHTML = "View Ticket";
         this.submit_button = document.createElement("button");
         let parent = this;
         this.submit_button.onclick = function () {
             parent.submitForm();
         };
+        if (show_view_ticket) {
+            this.view_button.onclick = function () {
+                parent.startViewer();
+            }
+        }
         this.submit_button.innerHTML = "Submit";
         this.action_container.appendChild(this.submit_button);
+        if (show_view_ticket) this.action_container.appendChild(this.view_button);
         let formDiv = document.createElement("div");
         formDiv.id = "ticket_panel";
         formDiv.className = "client";

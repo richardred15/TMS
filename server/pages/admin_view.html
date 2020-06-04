@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://richard.works/projects/TMS/common/style.css" />
+    <script src="https://richard.works/projects/TMS/admin/ticket_admin.js"></script>
+</head>
+
+<body>
+    <div id="ticket_panel" class="client"></div>
+    <script>
+        let ticket_template = '${ticket_template}';
+        let ticket_data = '${ticket_data}';
+        let TA = new TicketAdmin("", false);
+        TA.logged_in = true;
+        let form = TA.generateForm(ticket_template, false);
+        document.getElementById("ticket_panel").appendChild(form);
+        TA.fillForm(ticket_data);
+    </script>
+</body>
+
+</html>

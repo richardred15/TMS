@@ -5,6 +5,12 @@
             "data": "K",
             "internal": true
         },
+        "user_id": {
+            "internal": true,
+            "disabled": true,
+            "type": "text",
+            "label": "Customer ID"
+        },
         "status": {
             "type": "selection",
             "disabled": false,
