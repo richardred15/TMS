@@ -1,10 +1,13 @@
 let nodemailer = require("nodemailer");
 let Configuration = require("./configuration");
 class Mail {
-    constructor(from = '"CCC No Reply" <no-reply@richard.works>') {
+    constructor(from) {
+        if (!from) {
+            from = Configuration.get("mail").from;
+        }
         this.transporter = nodemailer.createTransport({
-            host: "smtp-relay.sendinblue.com",
-            port: 587,
+            host: Configuration.get("mail").host,
+            port: Configuration.get("mail").port,
             secureConnection: false, // use SSL
             auth: {
                 user: Configuration.get("mail").user,

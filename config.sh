@@ -8,6 +8,7 @@ trap finish EXIT
 clear
 re='^[0-9]+$'
 request="   Please Enter"
+url="http://"
 
 echo -e "   \033[31m============================================================"
 echo -e "   ==   @@@@@@@@@@@@@@  |||\\\\\\        ///|||   |||@@@@@|||   =="
@@ -51,14 +52,21 @@ function enable_https {
       fi
       if [ "$https" = "y" ]
       then
-            read -p "   Path to key file:  " https_key
-            read -p "   Path to cert file:  " https_cert
-            read -p "   Path to ca file:  " https_ca
+            read -p "   Path to Key File:  " https_key
+            read -p "   Path to Certificate File:  " https_cert
+            read -p "   Path to Chain File:  " https_ca
+            url="https://$host"
+      else
+            url="http://$host"
       fi
 
 }
-
+read -p "$request hostname e.g. richard.works:  " host
+read -p "$request url path e.g. /projects/TMS:  " path
 read -p "$request AES 256 bit key (enter for auto):  " key
+if [ "$key" = "" ] ; then
+      key=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9\/.,<>;":-=_+[]{}' | fold -w 32 | head -n 1)
+fi
 read -p "$request SMTP host (enter to disable email):  " smtp_host
 if [ -z "$smtp_host" ]
 then
@@ -66,12 +74,15 @@ then
       smtp_port=1
 else
       get_port
+      read -p "$request email FROM address (enter for 'No Reply' <no-reply@$host>):  " from_email
+      if [ "$from_email" = "" ] ; then
+            from_email="'No Reply' <no-reply@$host>"
+      fi
       read -p "$request SMTP user (enter for none):  " smtp_user
       read -p "$request SMTP pass (enter for none):  " smtp_pass
 fi
 
-read -p "$request base url e.g. https://richard.works:  " host
-read -p "$request url path e.g. /projects/TMS:  " path
+
 
 enable_https
 
@@ -85,7 +96,8 @@ text="{\n
 \t\t\"user\": \"$smtp_user\",\n
 \t\t\"pass\": \"$smtp_pass\"\n
 \t},\n
-\t\"host\": \"$host\",\n
+\t\"from\": \"$from_email\",\n
+\t\"host\": \"$url\",\n
 \t\"path\": \"$path\",\n
 \t\"https\": {\n
 \t\t\"key\": \"$https_key\",\n
