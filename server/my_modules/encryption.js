@@ -1,11 +1,5 @@
-//Configuration = require("./configuration.js");
+let Configuration = require("./configuration");
 let crypto = require("crypto");
-
-let Configuration = {
-    algorithm: "aes-256-ctr",
-    key: "lcy5qlKjqQMj2qA/Xv+IrDLBNV8/99UF"
-};
-
 class Encryption {
     static encrypt(data) {
         if (typeof data !== "string") throw new Error("Can't encrypt that!");
@@ -13,7 +7,7 @@ class Encryption {
         // Create an initialization vector
         const iv = crypto.randomBytes(16);
         // Create a new cipher using the algorithm, key, and iv
-        const cipher = crypto.createCipheriv(Configuration.algorithm, Configuration.key, iv);
+        const cipher = crypto.createCipheriv(Configuration.get("algorithm"), Configuration.get("key"), iv);
         // Create the new (encrypted) buffer
         const result = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
         return result;
@@ -25,7 +19,7 @@ class Encryption {
         // Get the rest
         encrypted = encrypted.slice(16);
         // Create a decipher
-        const decipher = crypto.createDecipheriv(Configuration.algorithm, Configuration.key, iv);
+        const decipher = crypto.createDecipheriv(Configuration.get("algorithm"), Configuration.get("key"), iv);
         // Actually decrypt it
         const result = Buffer.concat([decipher.update(encrypted), decipher.final()]);
         return result;

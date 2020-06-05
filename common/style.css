@@ -36,10 +36,15 @@
 }
 
 #ticket_form label {
-    margin: 10px 0px 0px 0px;
+    margin: 7px 0px 0px 0px;
     color: #fff;
     display: block;
     text-transform: capitalize;
+}
+
+.drop_down>label:first-child {
+    cursor: pointer;
+    margin-bottom: 10px !important;
 }
 
 ::-webkit-input-placeholder {
@@ -145,11 +150,66 @@
 }
 
 #ticket .call_info {
-    padding-bottom: 25px;
+    padding-bottom: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 40px 40px 1fr;
 }
+
+#ticket .call_info>div {
+    text-align: center;
+    line-height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#ticket .call_info>div input {
+    display: inline-block;
+    margin: 0px;
+    height: auto;
+    font-size: 16px;
+    width: 150px;
+    text-align: center;
+
+}
+
+#ticket .call_info>div:nth-child(5) {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    text-align: left;
+    line-height: normal;
+}
+
+#ticket .call_info>div:nth-child(2) {
+    grid-row: 2;
+    grid-column: 1;
+}
+
+#ticket .call_info label {
+    margin: 0px;
+}
+
+#ticket .call_info .drop_down label {
+    margin-top: 7px;
+}
+
+/* #ticket .call_info .duration {
+    grid-column: 2;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    line-height: 60px;
+}
+
+#ticket .call_info .duration .time {
+    margin-top: 7px;
+    font-size: 40px;
+} */
 
 #ticket .call_info .info {
     display: inline-block;
+    font-size: 14px;
+    font-weight: bold;
+    float: left;
+    margin-left: 20px;
 }
 
 #ticket .call_control button {
@@ -160,42 +220,93 @@
     font-size: 16px;
     padding: 10px 20px;
     margin-right: 10px;
+    margin-left: 10px;
     border-radius: 0px;
 }
 
 #ticket .call_control .call {
     margin-top: 10px;
-    padding: 5px 0px;
+    padding: 10px;
+    padding-top: 0px;
     border: 1px solid white;
     border-width: 1px 0px 1px 0px;
+    position: relative;
 }
 
-#ticket .call_control .end {
+#ticket .call_control .call.ongoing .id {
+    margin-left: 28px;
+}
+
+#ticket .call_control .call.ongoing:after {
+    content: '';
+    height: 24px;
+    width: 24px;
+    background-color: rgb(255, 85, 85);
+    border-radius: 12px;
     position: absolute;
-    bottom: 5px;
-    right: 5px;
+    top: 4px;
+    left: 5px;
+    animation: alert 2s ease-in 0s infinite;
+}
+
+#ticket .call_control>label {
+    margin-top: 5px;
 }
 
 #ticket .call_control .id {
     font-size: 18px;
     font-weight: bold;
+    margin-top: 5px;
 }
 
 #ticket .drop_down {
-    height: 140px;
-    max-height: 34px;
+    height: 32px;
     overflow: hidden;
-    padding: 5px;
+    position: relative;
     box-sizing: border-box;
     transition: all 0.3s ease;
+    padding: 10px;
+    padding-top: 0px;
+    margin-top: 5px;
+    background-color: rgba(208, 216, 255, 0.4);
+    border-radius: 5px;
+    border-bottom: 5px solid white;
 }
 
+
+
 #ticket .drop_down.showing {
-    max-height: 1200px;
+    height: 140px;
+    background-color: transparent;
+    border-radius: 0px;
+}
+
+#ticket .call_control.showing,
+#ticket .call.showing {
+    height: auto;
+}
+
+#ticket .call_info .drop_down {
+    border-bottom: 2px solid white;
+}
+
+#ticket .drop_down:before {
+    content: ">";
+    font-weight: bold;
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    color: white;
+    transform: rotate(0deg);
+    transition: all 0.3s ease;
 }
 
 #ticket_form #cancel_button {
     right: 160px;
+}
+
+#ticket .drop_down.showing:before {
+    transform: rotate(90deg);
 }
 
 #ticket_form select {
@@ -497,10 +608,10 @@ button {
 
 #ticket_list>div>div .option.unread .small {
     background-color: rgb(255, 98, 98);
-    animation: unread 2s ease-in 0s infinite;
+    animation: alert 2s ease-in 0s infinite;
 }
 
-@keyframes unread {
+@keyframes alert {
     0% {
         background-color: rgb(255, 98, 98);
     }

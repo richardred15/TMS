@@ -44,6 +44,15 @@ class CallManager {
         this.lastCall = max;
     }
 
+    getCallData() {
+        let packet = [];
+        for (let call_id in this.calls) {
+            let call = this.calls[call_id];
+            packet.push(call.getData());
+        }
+        return packet;
+    }
+
     generateControls() {
         let template = `<div class='call_control'><button>New Call</button>`;
         let end = "<button class='end'>End Call</button>";
@@ -82,13 +91,13 @@ class CallManager {
         return false;
     }
 
-    newCall(start = true) {
+    newCall(number, start = true) {
         if (!this.has_directory) {
             fs.mkdirSync(this.path);
             this.has_directory = true;
         }
         let id = this.genCallID();
-        let call = new Call(id, this.ticket_id);
+        let call = new Call(id, this.ticket_id, number);
         this.calls[id] = call;
         if (start) call.startCall();
         return call;

@@ -1,19 +1,27 @@
 let TicketManager = require("./my_modules/ticketmanager");
-
+let Mail = require("./my_modules/mail");
 var https = require('https');
 var fs = require('fs');
 var md5 = require("md5");
 var bcrypt = require("bcrypt");
 let User = require("./my_modules/user");
+let Configuration = require("./my_modules/configuration");
+
 let options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/richard.works/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/richard.works/cert.pem'),
-    ca: fs.readFileSync('/etc/letsencrypt/live/richard.works/chain.pem')
+    key: fs.readFileSync(Configuration.get("https").key),
+    cert: fs.readFileSync(Configuration.get("https").cert),
+    ca: fs.readFileSync(Configuration.get("https").ca)
 };
 
 var app = https.createServer(options, handler);
 var io = require('socket.io')(app);
 app.listen(3009);
+
+/* let Mailer = new Mail();
+
+Mailer.send("richardred15@gmail.com", "Test Email", `<h2><center>Testing Test Test</center></h2><div><pre>OH HAPPY DAY</pre></div>`);
+
+console.log("TEST"); */
 
 process.stdin.on("data", function (data) {
     let input = data.toString().trim();
@@ -65,17 +73,26 @@ let admin_nonces = {
 
 };
 
-function informAdmins(ticket_id) {
-    let ticket = tm.getTicket(ticket_id);
-    if (ticket) {
-        for (let admin of admins) {
-            io.sockets.to(admin).emit('ticket_update', {
-                id: ticket_id,
-                data: ticket.data
-            })
-        }
+function emitAdmins(event, data) {
+    for (let admin of admins) {
+        io.sockets.to(admin).emit(event, data)
     }
 }
+
+function informAdminTicket(ticket_id) {
+    let ticket = tm.getTicket(ticket_id);
+    if (ticket) {
+        emitAdmins('ticket_update', {
+            id: ticket_id,
+            data: ticket.data
+        });
+    }
+}
+
+function informAdminCall(data) {
+    emitAdmins('call_update', data);
+}
+
 
 io.on('connection', function (socket) {
     let nonce = getNONCE();
@@ -138,7 +155,7 @@ io.on('connection', function (socket) {
                 data: result
             });
             if (typeof result == "string") {
-                informAdmins(result);
+                informAdminTicket(result);
                 if (!admin) socket.disconnect();
             }
         } else {
@@ -150,16 +167,32 @@ io.on('connection', function (socket) {
     });
 
     socket.on('start_call', function (data) {
-        let ticket = tm.getTicket(data.ticket);
-        if (ticket) {
-            ticket.startCall();
+        if (admin) {
+            let ticket = tm.getTicket(data.ticket);
+            if (ticket && ticket.open) {
+                let call = ticket.startCall(data.number);
+                informAdminCall(call.getData());
+            }
+        }
+    });
+
+    socket.on('call_notes', function (data) {
+        if (admin) {
+            let ticket = tm.getTicket(data.ticket_id);
+            if (ticket) {
+                let call_data = ticket.updateCallNotes(data.id, data.notes);
+                informAdminCall(call_data);
+            }
         }
     });
 
     socket.on('end_call', function (data) {
-        let ticket = tm.getTicket(data.ticket);
-        if (ticket) {
-            ticket.endCall(data.call);
+        if (admin) {
+            let ticket = tm.getTicket(data.ticket);
+            if (ticket && ticket.open) {
+                let call = ticket.endCall(data.call);
+                informAdminCall(call.getData());
+            }
         }
     });
 
@@ -187,7 +220,7 @@ io.on('connection', function (socket) {
                     ticket.data[item] = data.data[item];
             }
             tm.updateTicket(data.id);
-            informAdmins(data.id);
+            informAdminTicket(data.id);
         }
     });
 
@@ -196,7 +229,7 @@ io.on('connection', function (socket) {
             let ticket = tm.getTicket(data.id);
             ticket.data.notes = data.notes;
             let success = tm.updateTicket(data.id);
-            informAdmins(data.id);
+            informAdminTicket(data.id);
             socket.emit('note_update_status', {
                 status: success ? "success" : "failure"
             });
@@ -232,17 +265,17 @@ io.on('connection', function (socket) {
     socket.on('admin_get_ticket', function (data) {
         if (admin) {
             let id = data.id;
-            let d = tm.getTicket(id);
-            if (d.data.status == "unread") {
-                d.data.status = "read";
+            let ticket = tm.getTicket(id);
+            if (ticket.data.status == "unread") {
+                ticket.data.status = "read";
                 tm.updateTicket(id);
-                informAdmins(data.id);
+                informAdminTicket(data.id);
             }
             socket.emit('admin_ticket_data', {
                 id: id,
-                data: d.data,
-                type: d.type,
-                call_controls: d.getCallControls()
+                data: ticket.data,
+                type: ticket.type,
+                call_data: ticket.getCallData()
             });
         }
     });
@@ -319,3 +352,10 @@ function handler(req, res) {
 };
 
 let tm = new TicketManager();
+
+/* let packet = {
+    tickets: tm.getAllData(),
+    users: {}
+}
+
+console.log(JSON.stringify(packet, {}, "    ")); */

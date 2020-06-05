@@ -9,11 +9,15 @@ class TicketAdmin {
         this.audio = document.createElement("audio");
         this.audio.src = "ding.wav";
         this.ticket_type = "questionnaire";
+        this.ticket_data = {};
         this.ticket_id = "";
+        this.call_id = "";
         this.form_templates = {};
         this.current_tab = "open";
         this.logged_in = false;
         this.notes_timeout = undefined;
+        this.call_notes_timeout = undefined;
+        this.awaiting_call = false;
         this.type_elements = {
             "text": "input",
             "message": "textarea",
@@ -146,7 +150,6 @@ class TicketAdmin {
             id: this.ticket_id,
             notes: this.ticket_container.querySelector("[name=notes]").value
         }
-        console.log(packet);
         this.socket.emit('admin_update_notes', packet);
     }
 
@@ -178,7 +181,6 @@ class TicketAdmin {
         this.selectTab("open");
         let list = this.internal_list.open.slice();
         list.push(...this.internal_list.closed);
-        console.log(list);
         this.socket.emit('admin_get_display_data', {
             list: list
         });
@@ -249,15 +251,47 @@ class TicketAdmin {
         });
 
         this.socket.on('note_update_status', function (data) {
-            console.log(data);
             if (data.status == "success") {
                 parent.ticket_container.querySelector("[name=notes].outdated").className = "";
             }
         });
 
+        this.socket.on('call_update', function (data) {
+            if (data.id != parent.editing_call_notes) {
+                if (data.ticket_id == parent.ticket_id) {
+                    let elm = document.getElementById(data.id);
+                    let newElm = parent.generateCallContainer(data);
+                    if (elm) {
+                        parent.call_control_container.insertBefore(newElm, elm);
+                        if (elm.querySelector(".drop_down").className.indexOf("showing") != -1) {
+                            newElm.querySelector(".drop_down").className += " showing";
+                        }
+                        if (elm.className.indexOf("showing") != -1) {
+                            newElm.className += " showing";
+                        }
+                        elm.querySelectorAll(".duration .time").forEach(e => {
+                            if (e.hasAttribute("interval")) {
+                                let interval = e.getAttribute("interval");
+                                clearInterval(interval);
+                            }
+                        });
+                        elm.remove();
+
+                    } else {
+                        parent.call_control_container.appendChild(newElm);
+                    }
+                    if (parent.awaiting_call) {
+                        let label = newElm.querySelector("label");
+                        label.click();
+                        parent.awaiting_call = false;
+                    }
+                }
+            } else {
+                //parent.editing_call_notes = "";
+            }
+        });
+
         this.socket.on('ticket_update', function (data) {
-            console.log("Ticket Update");
-            console.log(data);
             let opt = document.getElementById(data.id);
             let selected = false;
             if (opt) {
@@ -281,7 +315,6 @@ class TicketAdmin {
         });
 
         this.socket.on('login', function (data) {
-            console.log(data);
             if (data.status === "success") {
                 document.querySelector("#nav ul").className = "logged_in";
                 document.querySelector("#ticket_tabs").className = "logged_in";
@@ -302,7 +335,6 @@ class TicketAdmin {
     placeOption(opt, closed = false) {
         let selector = ".option" + (closed ? ".closed" : "");
         let opts = this.ticket_list.querySelectorAll(selector);
-        console.log(selector, closed);
         let placed = false;
         for (let e of opts) {
             if (parseInt(e.id.substr(1)) < parseInt(opt.id.substr(1))) {
@@ -406,7 +438,6 @@ class TicketAdmin {
             setTimeout(function () {
                 parent.requestListAll();
                 parent.getTicket(data.data);
-                console.log(data.data);
             }, 1000);
         }
     }
@@ -426,7 +457,6 @@ class TicketAdmin {
         let parent = this;
         let wrapper = document.createElement("div");
         this.ticket_list = document.createElement("div");
-        console.log(data.data);
         for (let ticket in data.data) {
             let opt = this.generateOption(ticket, data.data[ticket]);
             this.ticket_list.appendChild(opt);
@@ -453,7 +483,6 @@ class TicketAdmin {
 
     handleList(data) {
         if (!this.logged_in) return false;
-        console.log(data.data);
         this.internal_list = data.data;
         //this.requestOpenDisplayData();
         this.requestDisplayData();
@@ -462,22 +491,186 @@ class TicketAdmin {
     handleTemplate(data) {
         if (!this.logged_in) return false;
         for (let temp in data.data) {
-            console.log(temp);
             this.form_templates[temp] = data.data[temp];
         }
     }
 
     handleTicket(data) {
         if (!this.logged_in) return false;
-        console.log(data);
         this.ticket_type = data.type;
+        this.ticket_data = data;
         this.populateDisplay(data.type);
         this.fillForm(data);
         setTimeout(function () {
             this.ticket_panel.className = "";
         }, 500);
-        this.form.innerHTML = data.call_controls + this.form.innerHTML;
+        console.log(data);
+        this.call_control_container = this.generateCallControls(data.call_data, data.data.status != "closed");
+        this.form.prepend(this.call_control_container);
+
+
         this.setSelectedOption(data.data.id);
+    }
+
+    updateCallNotes(call_id, notes) {
+        clearTimeout(this.call_notes_timeout);
+        setTimeout(function (parent) {
+            parent.sendNotes(call_id, notes);
+        }, 300, this);
+    }
+
+    sendNotes(call_id, notes) {
+        this.socket.emit('call_notes', {
+            ticket_id: this.ticket_id,
+            id: call_id,
+            notes: notes
+        });
+    }
+
+    endCall(call_id) {
+        this.socket.emit('end_call', {
+            ticket: this.ticket_id,
+            call: call_id
+        });
+    }
+
+    startCall() {
+        if (this.ticket_data.data.status != "closed") {
+            let number = prompt("Number You are Calling", `${this.ticket_data.data.phone}`);
+            if (number) {
+                this.socket.emit('start_call', {
+                    ticket: this.ticket_id,
+                    number: number
+                });
+                this.awaiting_call = true;
+            }
+        }
+    }
+
+    generateCallControls(calls, open = true) {
+        let call_control_container = document.createElement("div");
+        call_control_container.className = "call_control drop_down";
+        call_control_container.innerHTML = `<label onclick="toggleClass(this.parentElement,'showing')">Customer Interactions</label>`;
+        if (open) {
+            let new_call_button = document.createElement("button");
+            new_call_button.innerHTML = "New Call";
+            let parent = this;
+            new_call_button.onclick = function () {
+                parent.startCall();
+            }
+            call_control_container.appendChild(new_call_button);
+
+            let new_email_button = document.createElement("button");
+            new_email_button.innerHTML = "New Email";
+            new_email_button.onclick = function () {
+                parent.newEmail();
+            }
+            call_control_container.appendChild(new_email_button);
+        }
+        for (let call of calls) {
+            let callDiv = this.generateCallContainer(call, open);
+            call_control_container.appendChild(callDiv);
+        }
+        return call_control_container;
+    }
+
+    generateCallContainer(call, open = true) {
+        let startDate = (new Date(call.start));
+        let startStr = ` ${startDate.toLocaleTimeString()}  <label class='small'>${startDate.toLocaleDateString()}</label>`;
+        let endStr;
+        if (call.end != 0) {
+            let endDate = (new Date(call.end));
+            endStr = ` ${endDate.toLocaleTimeString()}  <label class='small'>${endDate.toLocaleDateString()}</label>`;
+        } else {
+            endStr = `ongoing`;
+        }
+        let parent = this;
+        let callDiv = document.createElement("div");
+        callDiv.className = "call drop_down";
+        callDiv.id = call.id;
+        let notes = document.createElement("textarea");
+        notes.disabled = call.ongoing ? false : "disabled";
+        notes.innerHTML = call.notes;
+        if (call.ongoing) {
+            callDiv.className += " ongoing";
+            notes.onmousedown = function (e) {
+                parent.editing_call_notes = call.id;
+            }
+            notes.oninput = function (e) {
+                parent.editing_call_notes = call.id;
+                parent.updateCallNotes(call.id, notes.value);
+            }
+            notes.onblur = function (e) {
+                parent.editing_call_notes = "";
+            }
+        }
+        callDiv.innerHTML = `
+                        <label class='id'>${call.id}</label>
+                        <div class='call_info ${call.ongoing ? "" : "ended"}'>
+                            <div>
+                                <label class='info'>Start</label> <div class='time'> ${startStr}</div>  
+                            </div>                                                        
+                            <div>
+                                <label class='info'>End</label> <div class='time'> ${endStr}</div>
+                            </div>      
+                      
+                            <div class='duration'>
+                                <label class='info'>Duration:</label> <div class='time'>${call.ongoing ? formatDuration(call.start, (new Date()).getTime()) : formatDuration(call.start, call.end)}</div>
+                            </div>
+                            <div><label class='info'>Number:</label><div><input disabled type='text' value='${call.number}'/></div></div>
+                            <div class="drop_down">
+                                <label>Notes:</label>
+                            </div>
+                        </div>
+                    `;
+        callDiv.querySelector("label").onclick = function (e) {
+            parent.toggleDropDown(e.target.parentElement, !isKeyDown(17));
+        }
+        let notes_dropdown = callDiv.querySelector(".drop_down");
+        notes_dropdown.querySelector("label").onclick = function (e) {
+            parent.toggleDropDown(e.target.parentElement, false);
+        }
+        notes_dropdown.appendChild(notes);
+        if (call.ongoing && open) {
+            let timeDiv = callDiv.querySelector(".duration .time");
+            if (timeDiv) {
+                let interval = setInterval(function (elm) {
+                    elm.innerHTML = formatDuration(call.start, (new Date()).getTime())
+                }, 1000, timeDiv)
+                timeDiv.setAttribute("interval", interval);
+            }
+            let end = document.createElement("button");
+            end.className = "end";
+            end.innerHTML = "End Call";
+
+            end.onclick = function () {
+                parent.endCall(call.id)
+            };
+            callDiv.appendChild(end);
+        }
+        return callDiv;
+    }
+
+    toggleDropDown(elm, collapse) {
+        if (elm.className.indexOf("showing") == -1) {
+            this.openDropDown(elm, collapse);
+        } else {
+            this.openDropDown(elm, false);
+        }
+    }
+
+    openDropDown(elm, collapse = true) {
+        if (collapse) this.collapseDropDowns(this.call_control_container);
+        toggleClass(elm, "showing");
+    }
+
+    collapseDropDowns(in_elm) {
+        if (in_elm == undefined) {
+            in_elm = this.ticket_panel;
+        }
+        in_elm.querySelectorAll(".drop_down.showing").forEach(e => {
+            toggleClass(e, "showing");
+        });
     }
 
     setSelectedOption(id) {
@@ -533,7 +726,6 @@ class TicketAdmin {
 
     generateForm(template, action_container = true) {
         if (!this.logged_in) return false;
-        console.log(template);
         this.action_container = document.createElement("div");
         this.action_container.id = "action_container";
         this.output = document.createElement("div");

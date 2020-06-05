@@ -2,13 +2,14 @@ let Encryption = require("./encryption");
 let fs = require("fs");
 
 class Call {
-    constructor(id, ticket_id) {
-        this.startTime = "";
-        this.endTime = "";
+    constructor(id, ticket_id, number) {
+        this.startTime = 0;
+        this.endTime = 0;
         this.ongoing = false;
         this.id = id;
+        this.number = number;
         this.ticket_id = ticket_id;
-        this.notes = "";
+        this.notes = `Purpose:\r\n\r\n\r\n\r\nResolution:`;
         this.path = `./calls/${ticket_id}/${this.id}`;
         this.init();
     }
@@ -42,6 +43,19 @@ class Call {
         this.save();
     }
 
+    getData() {
+        let packet = {
+            id: this.id,
+            start: this.startTime,
+            end: this.endTime,
+            notes: this.notes,
+            ongoing: this.ongoing,
+            number: this.number,
+            ticket_id: this.ticket_id
+        }
+        return packet;
+    }
+
     load() {
         let data = fs.readFileSync(this.path);
         data = Encryption.decrypt(data);
@@ -50,18 +64,12 @@ class Call {
         this.endTime = data.end;
         this.notes = data.notes;
         this.ticket_id = data.ticket_id;
-        console.log(data);
+        this.ongoing = data.ongoing;
+        this.number = data.number;
     }
 
     save() {
-        let packet = {
-            start: this.startTime,
-            end: this.endTime,
-            notes: this.notes,
-            ongoing: this.ongoing,
-            ticket_id: this.ticket_id
-        }
-        console.log(packet);
+        let packet = this.getData();
         let data = Encryption.encrypt(JSON.stringify(packet));
         fs.writeFileSync(this.path, data);
     }

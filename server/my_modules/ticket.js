@@ -22,9 +22,9 @@ class Ticket {
         }
     }
 
-    startCall() {
-        let call = this.call_manager.newCall();
-        console.log(call);
+    startCall(number) {
+        let call = this.call_manager.newCall(number ? number : this.data.phone);
+        return call;
     }
 
     endCall(id) {
@@ -32,6 +32,28 @@ class Ticket {
         if (call) {
             call.endCall();
         }
+        return call;
+    }
+
+    updateCallNotes(id, notes) {
+        let call = this.call_manager.getCall(id);
+        if (call) {
+            call.updateNotes(notes);
+            return call.getData();
+        }
+        return false;
+    }
+
+    getCallData() {
+        return this.call_manager.getCallData();
+    }
+
+    getAllData() {
+        let packet = {
+            ticket_data: this.data,
+            call_data: this.call_manager.getCallData()
+        }
+        return packet;
     }
 
     getCallControls() {
