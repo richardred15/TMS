@@ -1,11 +1,11 @@
-let TicketManager = require("./my_modules/ticketmanager");
-let Mail = require("./my_modules/mail");
+let TicketManager = require("./tms_modules/ticketmanager");
+let Mail = require("./tms_modules/mail");
 var https = require('https');
 var fs = require('fs');
 var md5 = require("md5");
 var bcrypt = require("bcrypt");
-let User = require("./my_modules/user");
-let Configuration = require("./my_modules/configuration");
+let User = require("./tms_modules/user");
+let Configuration = require("./tms_modules/configuration");
 
 let options = {
     key: fs.readFileSync(Configuration.get("https").key),
