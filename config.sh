@@ -108,19 +108,3 @@ then
 else
       echo -e "\e[0mCanceling, goodbye"
 fi
-
-
-
-#    "mail": {
-#        "host": "smtp-relay.sendinblue.com",
-#        "port": 587,
-#        "user": "richardred15@gmail.com",
-#        "pass": "xsmtpsib-b6613b09863e61235c070577bb03184cf0af95473dd4587fdfbaf633a7ebebf8-JdkEzOB9tsXvKxcQ"
-#    },
-#    "host": "https://richard.works",
-#    "path": "/projects/TMS",
-#    "https": {
-#        "key": "/etc/letsencrypt/live/richard.works/privkey.pem",
-#        "cert": "/etc/letsencrypt/live/richard.works/cert.pem",
-#        "ca": "/etc/letsencrypt/live/richard.works/chain.pem"
-#    }
