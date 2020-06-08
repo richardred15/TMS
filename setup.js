@@ -286,16 +286,32 @@ process.on('SIGINT', function () {
 
 function finish(installed) {
     if (installed) {
-        fs.writeFileSync("config.json", JSON.stringify(config, {}, '\t'));
-        fs.writeFileSync("config.js", "let config = " + JSON.stringify({
-            host: config.host,
-            port: config.port
-        }));
+        let copied_server = false;
+        let copied_common = false;
+        if (fs.existsSync("server/config.json")) {
+            fs.writeFileSync("config.json", JSON.stringify(config, {}, '\t'));
+        } else {
+            fs.writeFileSync("server/config.json", JSON.stringify(config, {}, '\t'));
+            copied_server = true;
+        }
+        if (fs.existsSync("server/config.js")) {
+            fs.writeFileSync("config.js", "let config = " + JSON.stringify({
+                host: config.host,
+                port: config.port
+            }));
+        } else {
+            fs.writeFileSync("common/config.js", "let config = " + JSON.stringify({
+                host: config.host,
+                port: config.port
+            }));
+            copied_common = true;
+        }
+
         process.stdout.write("   config.json written...\n\n");
-        process.stdout.write(`   Copy \x1b[33m./config.json\x1b[0m to \x1b[33m./server/config.json\x1b[0m if it is correct\n\n`);
+        if (!copied_server) process.stdout.write(`   Copy \x1b[33m./config.json\x1b[0m to \x1b[33m./server/config.json\x1b[0m if it is correct\n\n`);
 
         process.stdout.write("   config.js written...\n\n");
-        process.stdout.write(`   Copy \x1b[33m./config.js\x1b[0m to \x1b[33m./common/config.js\x1b[0m if it is correct\n\n`);
+        if (!copied_common) process.stdout.write(`   Copy \x1b[33m./config.js\x1b[0m to \x1b[33m./common/config.js\x1b[0m if it is correct\n\n`);
 
         process.stdout.write(`   To start the server on port \x1b[36m${config.port}\x1b[0m run:\n\n`);
         process.stdout.write(`           \x1b[35mcd server\x1b[0m\n\n`);
