@@ -5,8 +5,8 @@ type node >/dev/null 2>&1 || { has_node=false; }
 if $has_node ; then
     apache=true
     nginx=true
-    type apache22 >/dev/null 2>&1 || apache=false
-    type nginx2 >/dev/null 2>&1 || nginx=false
+    type apache2 >/dev/null 2>&1 || apache=false
+    type nginx >/dev/null 2>&1 || nginx=false
     if ! $nginx && ! $apache ; then
         echo -e "   \033[31mNo web server found, html pages may not be served!\e[0m"
         echo
