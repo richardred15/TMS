@@ -376,6 +376,13 @@ function handler(req, res) {
     res.end();
 };
 
+if (!fs.existsSync("tickets")) {
+    fs.mkdirSync("tickets");
+    fs.mkdirSync("tickets/open");
+    fs.mkdirSync("tickets/closed");
+    fs.mkdirSync("tickets/archive");
+}
+
 let tm = new TicketManager();
 
 /* let packet = {
