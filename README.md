@@ -25,6 +25,12 @@ new admin <username> <password>
 Administrator "<username>" successfully created!
 ```
 ![Admin Login](https://i.imgur.com/a9nfrCj.png)
+#### Admin View
+![Admin View](https://i.imgur.com/pAJeQp5.png)
+#### New Admin Ticket
+![New Ticket](https://i.imgur.com/zJEOZMf.png)
+#### Ticket Status Indication
+![Status Indicator](https://i.imgur.com/OiMqrKQ.gif)
 ### server/template.json
 ```javascript
     "form_type":{
