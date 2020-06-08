@@ -30,7 +30,6 @@ process.stdin.on("data", function (data) {
     parts.splice(0, 1);
     switch (cmd) {
         case "new":
-            console.log(parts);
             if (parts.length > 2) {
                 let type = parts[0];
                 if (type != "customer" && type != "admin") {
