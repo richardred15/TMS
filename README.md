@@ -64,3 +64,5 @@ Administrator "<username>" successfully created!
 
 ## TODO
 - [ ] Input Verification
+- [ ] Email Configuration
+- [ ] Email Templates
