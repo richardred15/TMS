@@ -287,7 +287,7 @@ process.on('SIGINT', function () {
 function finish(installed) {
     if (installed) {
         fs.writeFileSync("config.json", JSON.stringify(config, {}, '\t'));
-        fs.writeFileSync("config.js", JSON.stringify({
+        fs.writeFileSync("config.js", "let config = " + JSON.stringify({
             host: config.host,
             port: config.port
         }));
