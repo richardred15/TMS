@@ -38,7 +38,15 @@ process.stdin.on("data", function (data) {
                     let user = User.create(parts[1], parts[2], {
                         is_admin: type == "admin"
                     });
-                    console.log(user);
+                    if (user) {
+                        if (user.exists && user.logged_in) {
+                            console.log(`${type == "admin" ? "Administrator" : "Customer"} "${parts[1]}" successfully created!`);
+                        } else {
+                            console.log("There was an error creating that user!");
+                        }
+                    } else {
+                        console.log("User already exists!");
+                    }
                 }
             } else {
                 console.log("Invalid command options");
@@ -387,7 +395,7 @@ if (!fs.existsSync("tickets")) {
 }
 
 let tm = new TicketManager();
-
+console.log("Server Initialized...");
 /* let packet = {
     tickets: tm.getAllData(),
     users: {}

@@ -10,6 +10,21 @@ cd TMS
 chmod +x setup.sh
 ./setup.sh
 ```
+#### Post Setup
+```
+cd server
+sudo npm install
+node server.js
+```
+
+### User Create - Node Server Command
+```
+user@address:/path/to/server# node server.js
+Server Initialized...
+new admin <username> <password>
+Administrator "<username>" successfully created!
+```
+![Admin Login](https://i.imgur.com/a9nfrCj.png)
 ### server/template.json
 ```javascript
     "form_type":{
@@ -25,7 +40,7 @@ chmod +x setup.sh
         }
     }
 ```
-#### Example
+#### Example (more in server/template.json)
 ```javascript
     "method": {
         "type": "selection",
