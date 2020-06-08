@@ -1,9 +1,15 @@
 # TMS
 
 ## Ticket Management System
-(This project is in the first hours of development e.g. the "getting it working" stage - feedback is encouraged)
-
 Allow users to create tickets (contact forms) using simple templates
+
+### Install
+```
+git clone https://github.com/richardred15/TMS.git
+cd TMS
+chmod +x setup.sh
+./setup.sh
+```
 
 ```javascript
     "form_type":{
