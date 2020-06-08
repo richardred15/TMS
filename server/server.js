@@ -376,6 +376,10 @@ function handler(req, res) {
     res.end();
 };
 
+if (!fs.existsSync("users"))
+    fs.mkdirSync("users");
+if (!fs.existsSync("calls"))
+    fs.mkdirSync("calls");
 if (!fs.existsSync("tickets")) {
     fs.mkdirSync("tickets");
     fs.mkdirSync("tickets/open");
