@@ -41,6 +41,7 @@ function submitForm() {
 function generateForm(template, view_another = false) {
     let action_container = document.createElement("div");
     action_container.id = "action_container";
+    action_container.className = "action_container";
     let output = document.createElement("div");
     output.id = "output";
     let submit_button = document.createElement("button");
@@ -52,6 +53,7 @@ function generateForm(template, view_another = false) {
     formDiv.id = "ticket_panel";
     formDiv.className = "client";
     form = document.createElement("form");
+    form.className = "form_container";
     form.setAttribute("onsubmit", "return false;");
     form.id = "ticket_form";
     for (let item in template) {

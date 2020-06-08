@@ -170,7 +170,6 @@ class TicketManager {
     getAllData() {
         let tickets = this.ticketList.open.slice();
         tickets.push(...this.ticketList.closed);
-        console.log(tickets);
         let packet = {};
         for (let ticket of tickets) {
             packet[ticket] = this.getTicket(ticket).getAllData();

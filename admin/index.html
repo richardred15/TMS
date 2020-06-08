@@ -13,65 +13,9 @@
 </head>
 
 <body>
-    <div id="ticket_panel">
-        <div id="nav">
-            <ul>
-                <li onclick="TA.newTicket()">New Ticket</li>
-                <li onclick="TA.closeTicket()">Close Ticket</li>
-                <li onclick="TA.hideTicket()">Hide Ticket</li>
-                <li onclick="TA.requestPopout()">Popout Ticket</li>
-            </ul>
-            <input id="search_box" placeholder="Search" />
-        </div>
-        <div id="ticket_tabs">
-            <div onclick="TA.showOpenDisplayData()" class="tab open selected">Open</div>
-            <div onclick="TA.showClosedDisplayData()" class="tab closed">Closed</div>
-        </div>
-        <div id="ticket_list"></div>
-        <div id="ticket"></div>
-        <div id="loader" class="loader"></div>
-    </div>
+
     <script>
-        function toggleClass(elm, clss) {
-            let className = elm.className;
-            if (className.indexOf(clss) == -1) {
-                className += " " + clss;
-            } else {
-                className = className.replace(clss, "").replace("  ", " ");
-            }
-            elm.className = className;
-        }
-
-        function formatTime(time) {
-            return ("0" + time).substr(-2);
-        }
-
-        let keys_down = [];
-        window.onkeydown = function (e) {
-            if (keys_down.indexOf(e.keyCode) == -1)
-                keys_down.push(e.keyCode);
-        }
-        window.onkeyup = function (e) {
-            let i = keys_down.indexOf(e.keyCode);
-            keys_down.splice(i, 1);
-        }
-        window.onblur = function () {
-            keys_down = [];
-        }
-
-        function isKeyDown(keyCode) {
-            let isIt = keys_down.indexOf(keyCode) != -1;
-            return isIt;
-        }
-
-        function formatDuration(start, end) {
-            let duration = (new Date(end)) - (new Date(start));
-            let seconds = Math.floor(duration / 1000);
-            let minutes = Math.floor(seconds / 60);
-            let hours = Math.floor(minutes / 60);
-            return `${formatTime(hours)}:${formatTime(minutes%60)}:${formatTime(seconds%60)}`;
-        }
-        let TA = new TicketAdmin();
+        let admin = new Admin("https://richard.works:3009");
     </script>
 </body>
 

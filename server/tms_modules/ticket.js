@@ -142,7 +142,6 @@ class Ticket {
 
     generateFulltext() {
         this.fulltext = "";
-        console.log(this.data);
         for (let item of this.fulltext_items) {
             if (this.data[item]) {
                 this.fulltext += this.data[item].toString();

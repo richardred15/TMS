@@ -1,11 +1,39 @@
 #!/bin/bash          
 function finish {
       clear
-      echo -e "\e[33mTHANK YOU FOR USING TMS CONFIG\e[0m"
+      if $created ; then
+            echo
+            type node >/dev/null 2>&1 || { echo -e >&2 "   \033[31mTMS requires NodeJS!\e[0m"; echo; }
+            apache=true
+            nginx=true
+            type apache2 >/dev/null 2>&1 || apache=false
+            type nginx >/dev/null 2>&1 || nginx=false
+            if ! $nginx && ! $apache ; then
+                  echo -e "   \033[31mNo web server found, html pages may not be served!\e[0m"
+                  echo
+            fi
+            echo -e "   Copy \033[33m./config.json\e[0m to \033[33m./server/config.json\e[0m if it is correct"
+            echo
+            echo -e "   To start the server on port \e[36m$port\e[0m run \033[35mnode server/server.js\e[0m"
+            echo
+            echo -e "   Your admin panel is accessible at \033[32m$url$path/admin\e[0m"
+            echo
+            echo -e "   Clients can connect to the default panel at \033[32m$url$path/client\e[0m"
+            echo -e "      Copy contents of \033[33m./client\e[0m folder to"
+            echo -e "         this directory to make client url \033[32m$url$path/"
+            echo
+      fi
+      echo -e "   \e[33m
+             ___                     __     
+              | |__| /\ |\ ||_/  \_//  \/  \\
+              | |  |/--\| \|| \   | \__/\__/
+                               \e[0m"
 }
-open=false
+
+created=false
 trap finish EXIT
 clear
+
 re='^[0-9]+$'
 request="   Please Enter"
 url="http://"
@@ -37,6 +65,18 @@ function get_port {
       fi
 }
 
+function get_host {
+      read -p "$request hostname e.g. richard.works:  " host
+      if [ "$host" = "" ] ; then
+            echo "   Hostname cannot be blank!"
+            get_host
+            return 0
+      fi
+      if [ "${host: -1}" = "/" ] ; then
+            host=${host:0:-1}
+      fi
+}
+
 function enable_https {
       read -p "   Enable HTTPS [y/n] (enter for yes):  " https
       https="$(echo $https | tr '[:upper:]' '[:lower:]')"
@@ -61,8 +101,15 @@ function enable_https {
       fi
 
 }
-read -p "$request hostname e.g. richard.works:  " host
-read -p "$request url path e.g. /projects/TMS:  " path
+get_host
+read -p "$request NodeJS server port (enter for 3009):  " port
+if [ "$port" = "" ] ; then
+      port=3009
+fi
+read -p "$request url path e.g. /projects/TMS (enter for /):  " path
+if [ "${path: -1}" = "/" ] ; then
+      path=${path:0:-1}
+fi
 read -p "$request AES 256 bit key (enter for auto):  " key
 if [ "$key" = "" ] ; then
       key=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9\/.,<>;":-=_+[]{}' | fold -w 32 | head -n 1)
@@ -87,7 +134,7 @@ fi
 enable_https
 
 
-text="{\n
+text="\t{\n
 \t\"algorithm\": \"aes-256-ctr\",\n
 \t\"key\":\"$key\",\n
 \t\"mail\": {\n
@@ -98,25 +145,26 @@ text="{\n
 \t},\n
 \t\"from\": \"$from_email\",\n
 \t\"host\": \"$url\",\n
+\t\"port\": \"$port\",\n
 \t\"path\": \"$path\",\n
 \t\"https\": {\n
 \t\t\"key\": \"$https_key\",\n
 \t\t\"cert\": \"$https_cert\",\n
 \t\t\"ca\": \"$https_ca\"\n
 \t}\n
-}"
+\t}"
 
-echo -e "\033[32mPlease Review the Following Configuration:\e[0m"
+echo -e "   \033[32mPlease Review the Following Configuration:\e[0m"
 echo
 echo -e $text
 echo
-echo -e "\033[31mPress enter to save OR ctrl-c to cancel\e[0m"
+echo -e "   \033[31mPress enter to save OR ctrl-c to cancel\e[0m"
 read -p "" cancel
 if [ "$cancel" = "" ]
 then
       echo -e $text > config.json
       echo "FILE SAVED TO ./config.json"
-      open=true
+      created=true
 else
       echo -e "\e[0mCanceling, goodbye"
 fi

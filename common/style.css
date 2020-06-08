@@ -1,4 +1,4 @@
-#ticket_form {
+.form_container {
     padding: 10px;
     border-radius: 4px;
     box-sizing: border-box;
@@ -10,32 +10,32 @@
     transition: all 0.3s ease;
 }
 
-#ticket_form.success {
+.form_container.success {
     overflow: hidden;
     height: 0px;
     padding: 0px;
 }
 
-#ticket_form .outdated {
+.form_container .outdated {
     border-color: red;
     color: #ffdddd;
 }
 
-#action_container {
+.action_container {
     margin: auto;
 }
 
-#action_container button {
+.action_container button {
     margin-left: 5px;
 }
 
-#ticket_form,
-#action_container {
+.form_container,
+.action_container {
     max-width: 610px;
     width: 100%;
 }
 
-#ticket_form label {
+.form_container label {
     margin: 7px 0px 0px 0px;
     color: #fff;
     display: block;
@@ -73,12 +73,12 @@
     ;
 }
 
-#ticket_panel label.small {
+.panel label.small {
     font-size: 12px;
     display: inline-block;
 }
 
-#ticket_panel label.timeago {
+.panel label.timeago {
     display: block;
     font-size: 10px;
     font-weight: bold;
@@ -86,7 +86,7 @@
     padding-right: 20px;
 }
 
-#ticket_form input {
+.form_container input {
     width: 100%;
     height: 30px;
     display: block;
@@ -96,39 +96,39 @@
     border-bottom: 1px solid rgb(197, 197, 197);
 }
 
-#ticket_form input[name=status] {
+.form_container input[name=status] {
     text-transform: uppercase;
 }
 
-#ticket_form input,
-#ticket_form textarea,
-#ticket_form select,
-#ticket_form option {
+.form_container input,
+.form_container textarea,
+.form_container select,
+.form_container option {
     max-width: 600px;
     background-color: rgba(208, 216, 255, 0.4);
     color: white;
 }
 
-#ticket_form input:disabled,
-#ticket_form textarea:disabled,
-#ticket_form select:disabled,
-#ticket_form option:disabled {
+.form_container input:disabled,
+.form_container textarea:disabled,
+.form_container select:disabled,
+.form_container option:disabled {
     background-color: rgba(208, 216, 255, 0.1);
     border: none;
 }
 
-#ticket_form option {
+.form_container option {
     color: black;
 }
 
-#ticket_form textarea {
+.form_container textarea {
     width: 100%;
     height: 100px;
     display: block;
     margin-bottom: 10px;
 }
 
-#ticket_form button {
+.form_container button {
     color: white;
     font-weight: bold;
     background-color: #f26522;
@@ -141,28 +141,28 @@
     cursor: pointer;
 }
 
-#ticket .call_control {
+.data_container .call_control {
     position: relative;
 }
 
-#ticket .call_control .time {
+.data_container .call_control .time {
     display: inline-block;
 }
 
-#ticket .call_info {
+.data_container .call_info {
     padding-bottom: 5px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 40px 40px 1fr;
 }
 
-#ticket .call_info>div {
+.data_container .call_info>div {
     text-align: center;
     line-height: 40px;
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-#ticket .call_info>div input {
+.data_container .call_info>div input {
     display: inline-block;
     margin: 0px;
     height: auto;
@@ -172,39 +172,39 @@
 
 }
 
-#ticket .call_info>div:nth-child(5) {
+.data_container .call_info>div:nth-child(5) {
     grid-column-start: 1;
     grid-column-end: 3;
     text-align: left;
     line-height: normal;
 }
 
-#ticket .call_info>div:nth-child(2) {
+.data_container .call_info>div:nth-child(2) {
     grid-row: 2;
     grid-column: 1;
 }
 
-#ticket .call_info label {
+.data_container .call_info label {
     margin: 0px;
 }
 
-#ticket .call_info .drop_down label {
+.data_container .call_info .drop_down label {
     margin-top: 7px;
 }
 
-/* #ticket .call_info .duration {
+/* .data_container .call_info .duration {
     grid-column: 2;
     grid-row-start: 1;
     grid-row-end: 3;
     line-height: 60px;
 }
 
-#ticket .call_info .duration .time {
+.data_container .call_info .duration .time {
     margin-top: 7px;
     font-size: 40px;
 } */
 
-#ticket .call_info .info {
+.data_container .call_info .info {
     display: inline-block;
     font-size: 14px;
     font-weight: bold;
@@ -212,7 +212,7 @@
     margin-left: 20px;
 }
 
-#ticket .call_control button {
+.data_container .call_control button {
     color: black;
     background-color: white;
     position: relative;
@@ -224,7 +224,7 @@
     border-radius: 0px;
 }
 
-#ticket .call_control .call {
+.data_container .call_control .call {
     margin-top: 10px;
     padding: 10px;
     padding-top: 0px;
@@ -233,11 +233,11 @@
     position: relative;
 }
 
-#ticket .call_control .call.ongoing .id {
+.data_container .call_control .call.ongoing .id {
     margin-left: 28px;
 }
 
-#ticket .call_control .call.ongoing:after {
+.data_container .call_control .call.ongoing:after {
     content: '';
     height: 24px;
     width: 24px;
@@ -249,17 +249,17 @@
     animation: alert 2s ease-in 0s infinite;
 }
 
-#ticket .call_control>label {
+.data_container .call_control>label {
     margin-top: 5px;
 }
 
-#ticket .call_control .id {
+.data_container .call_control .id {
     font-size: 18px;
     font-weight: bold;
     margin-top: 5px;
 }
 
-#ticket .drop_down {
+.data_container .drop_down {
     height: 32px;
     overflow: hidden;
     position: relative;
@@ -275,22 +275,22 @@
 
 
 
-#ticket .drop_down.showing {
+.data_container .drop_down.showing {
     height: 140px;
     background-color: transparent;
     border-radius: 0px;
 }
 
-#ticket .call_control.showing,
-#ticket .call.showing {
+.data_container .call_control.showing,
+.data_container .call.showing {
     height: auto;
 }
 
-#ticket .call_info .drop_down {
+.data_container .call_info .drop_down {
     border-bottom: 2px solid white;
 }
 
-#ticket .drop_down:before {
+.data_container .drop_down:before {
     content: ">";
     font-weight: bold;
     position: absolute;
@@ -301,15 +301,15 @@
     transition: all 0.3s ease;
 }
 
-#ticket_form #cancel_button {
+.form_container #cancel_button {
     right: 160px;
 }
 
-#ticket .drop_down.showing:before {
+.data_container .drop_down.showing:before {
     transform: rotate(90deg);
 }
 
-#ticket_form select {
+.form_container select {
     padding-top: 3px;
     width: 100%;
     font-size: 22px;
@@ -320,13 +320,13 @@
     text-transform: capitalize;
 }
 
-#ticket_form .other {
+.form_container .other {
     margin-top: 0px;
     height: 0px;
     border-width: 0px;
 }
 
-#ticket_form .other.showing {
+.form_container .other.showing {
     margin-top: 5px;
     height: auto;
     border-width: 1px;
@@ -371,7 +371,7 @@ button {
     cursor: pointer;
 }
 
-#ticket_panel {
+.panel {
     display: grid;
     grid-template-rows: 50px 35px 1fr;
     grid-template-columns: 200px 1fr;
@@ -393,7 +393,7 @@ button {
 }
 
 
-#ticket_panel.client {
+.panel.client {
     grid-template-columns: none;
     grid-template-rows: none;
     padding-bottom: 20px;
@@ -401,7 +401,7 @@ button {
     position: relative;
 }
 
-#ticket_panel.client:before {
+.panel.client:before {
     content: "";
     position: absolute;
     top: 0px;
@@ -411,7 +411,7 @@ button {
     width: 100%;
 }
 
-#nav {
+.nav {
     grid-row: 1;
     grid-column-start: 1;
     grid-column-end: 3;
@@ -432,7 +432,7 @@ button {
     box-shadow: 0px 2px 10px -4px rgba(0, 0, 0, 0.4);
 }
 
-#nav #search_box {
+.nav .search_box {
     position: absolute;
     right: 8px;
     top: 9px;
@@ -441,7 +441,7 @@ button {
     width: 250px;
 }
 
-#nav ul {
+.nav ul {
     list-style-type: none;
     margin-block-start: 0px;
     padding-inline-start: 10px;
@@ -450,11 +450,11 @@ button {
     margin-top: 11px;
 }
 
-#nav ul.logged_in {
+.nav ul.logged_in {
     display: block;
 }
 
-#nav ul li {
+.nav ul li {
     display: inline-block;
     padding: 5px 10px;
     color: white;
@@ -462,7 +462,7 @@ button {
     cursor: pointer;
 }
 
-#ticket {
+.data_container {
     grid-row-start: 2;
     grid-row-end: 4;
     padding-bottom: 20px;
@@ -470,7 +470,7 @@ button {
     color: #ddd;
 }
 
-#ticket::before {
+.data_container::before {
     content: '';
     position: absolute;
     top: 0px;
@@ -484,21 +484,21 @@ button {
     pointer-events: none;
 }
 
-#ticket_panel.waiting #ticket::before {
+.panel.waiting .data_container::before {
     opacity: 1;
     pointer-events: all;
 }
 
-#ticket>div {
+.data_container>div {
     transition: all 0.3s ease;
     opacity: 1;
 }
 
-#ticket_panel.waiting #ticket>div {
+.panel.waiting .data_container>div {
     opacity: 0;
 }
 
-#ticket_tabs {
+.tab_container {
     background: #ea652c;
 
     position: relative;
@@ -507,7 +507,7 @@ button {
     grid-template-columns: 1fr 1fr;
 }
 
-#ticket_tabs .tab {
+.tab_container .tab {
     display: inline-block;
     padding: 5px 10px;
     padding-bottom: 4px;
@@ -518,23 +518,24 @@ button {
     font-size: 14px;
     border-color: gray;
     float: right;
+    color: lightgray;
     cursor: pointer;
     display: none;
     text-align: center;
 
 }
 
-#ticket_tabs.logged_in .tab {
+.tab_container.logged_in .tab {
     display: block;
 }
 
-#ticket_tabs .selected {
+.tab_container .selected {
     color: white;
     font-weight: bold;
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-#ticket_list {
+.list {
     grid-row: 3;
     overflow: hidden;
     /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ea652c+0,ef4b00+100 */
@@ -552,11 +553,11 @@ button {
 
 }
 
-#ticket_list .small {
+.list .small {
     vertical-align: middle;
 }
 
-#ticket_list>div {
+.list>div {
     overflow: hidden;
     overflow-y: scroll;
     height: 500px;
@@ -564,16 +565,25 @@ button {
     width: 220px;
 }
 
-#ticket_list>div>div {
+.list>div>div {
     width: 220px;
     padding-top: 2px;
     height: 100%;
     font-size: 20px;
     border: none;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f1946c+0,ffffff+100&1+0,0+46 */
+    background: -moz-linear-gradient(top, rgba(241, 148, 108, 1) 0%, rgba(247, 197, 176, 0) 46%, rgba(255, 255, 255, 0) 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(241, 148, 108, 1) 0%, rgba(247, 197, 176, 0) 46%, rgba(255, 255, 255, 0) 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(241, 148, 108, 1) 0%, rgba(247, 197, 176, 0) 46%, rgba(255, 255, 255, 0) 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f1946c', endColorstr='#00ffffff', GradientType=0);
+    /* IE6-9 */
 
 }
 
-#ticket_list>div>div .option {
+.list>div>div .option {
     color: white;
     cursor: pointer;
     padding: 10px;
@@ -582,64 +592,72 @@ button {
     border-style: solid;
 }
 
-#ticket_list>div>div .option .small {
+.list>div>div .option * {
+    cursor: pointer;
+}
+
+.list>div>div .option .small {
     display: inline-block;
     width: 24px;
     height: 24px;
     border-radius: 12px;
 }
 
-#ticket_list>div>div .option.closed {
+.list>div>div .option.closed {
     display: none;
     color: #d6d6d6;
 }
 
-#ticket_list>div>div .option.closed .small {
+.list>div>div .option.closed .small {
     background-color: lightgray;
 }
 
-#ticket_list>div>div.closed .option {
+.list>div>div.closed .option {
     display: none;
 }
 
-#ticket_list>div>div.closed .option.closed {
+.list>div>div.closed .option.closed {
     display: block;
 }
 
-#ticket_list>div>div .option.unread .small {
+.list>div>div .option.unread .small {
     background-color: rgb(255, 98, 98);
     animation: alert 2s ease-in 0s infinite;
 }
 
 @keyframes alert {
     0% {
-        background-color: rgb(255, 98, 98);
+        background-color: #ffa9a9;
     }
 
-    50% {
+    25% {
+        background-color: rgb(255, 45, 45);
+    }
+
+    75% {
         background-color: rgb(255, 45, 45);
     }
 
     100% {
-        background-color: rgb(255, 98, 98);
+        background-color: #ffa9a9;
     }
 }
 
-#ticket_list>div>div .option.read .small {
+.list>div>div .option.read .small {
     background-color: rgb(0, 153, 255);
     color: #fff;
 }
 
-#ticket_list>div>div .option.awaiting .small {
+.list>div>div .option.awaiting .small {
     background-color: #fdf59a;
 }
 
-#ticket_list>div>div .option:hover {
-    background-color: #ff874f;
+.list>div>div .option:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
-#ticket_list>div>div .option.selected {
-    background-color: #f26522;
+.list>div>div .option.selected {
+    background-color: #276ac1;
     font-weight: bold;
     color: white;
 }
@@ -689,7 +707,7 @@ h1.customer_name h4 {
     transition: all 0.3s ease;
 }
 
-#ticket_panel.waiting .loader {
+.panel.waiting .loader {
     opacity: 1;
     pointer-events: all;
     -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;

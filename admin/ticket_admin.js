@@ -1,11 +1,245 @@
-class TicketAdmin {
-    constructor(server_url = 'https://richard.works:3009', connect = true) {
+Element.prototype.addClass = function (name) {
+    if (!this.hasClass(name)) this.className = (this.className + " " + name).trim();
+}
+
+Element.prototype.removeClass = function (name) {
+    this.className = this.className.replace(name, "").replace("  ", " ").trim();
+}
+
+Element.prototype.hasClass = function (name) {
+    return this.className.indexOf(name) !== -1;
+}
+
+Element.prototype.toggleClass = function (name) {
+    if (this.hasClass(name)) {
+        this.removeClass(name);
+    } else {
+        this.addClass(name);
+    }
+}
+
+/* function toggleClass(elm, clss) {
+    let className = elm.className;
+    if (className.indexOf(clss) == -1) {
+        className += " " + clss;
+    } else {
+        className = className.replace(clss, "").replace("  ", " ");
+    }
+    elm.className = className.trim();
+} */
+
+
+
+
+
+let keys_down = [];
+window.onkeydown = function (e) {
+    if (keys_down.indexOf(e.keyCode) == -1)
+        keys_down.push(e.keyCode);
+}
+window.onkeyup = function (e) {
+    let i = keys_down.indexOf(e.keyCode);
+    keys_down.splice(i, 1);
+}
+window.onblur = function () {
+    keys_down = [];
+}
+
+function isKeyDown(keyCode) {
+    let isIt = keys_down.indexOf(keyCode) != -1;
+    return isIt;
+}
+
+class Helper {
+    static formatTime(time) {
+        return ("0" + time).substr(-2);
+    }
+
+    static formatDuration(start, end) {
+        let duration = (new Date(end)) - (new Date(start));
+        let seconds = Math.floor(duration / 1000);
+        let minutes = Math.floor(seconds / 60);
+        let hours = Math.floor(minutes / 60);
+        return `${Helper.formatTime(hours)}:${Helper.formatTime(minutes%60)}:${Helper.formatTime(seconds%60)}`;
+    }
+}
+class StyleParser {
+    static getStyle(elm) {
+        var css = window.getComputedStyle(elm);
+        let div = document.createElement("div");
+        elm.parentElement.insertBefore(div, elm);
+        var comp = window.getComputedStyle(div);
+        var style = ""
+        for (var i = 0; i < css.length; i++) {
+            if (css.getPropertyValue(css[i]) != comp.getPropertyValue(css[i])) {
+                style += `${css[i]}:${css.getPropertyValue(css[i])};`;
+            }
+        }
+        div.remove();
+        return style;
+    }
+
+    static getSelector(elm) {
+        let selector = elm.tagName.toLowerCase();
+        if (elm.id != "") selector += `#${elm.id}`;
+        if (elm.className != "") selector += "." + elm.className.split(" ").join(".")
+        return selector;
+    }
+
+    static getStyles(element = document.body) {
+        let styles = {};
+        for (let elm of element.childNodes) {
+            if (elm.tagName == "SCRIPT" || !elm.tagName) continue;
+            styles[getSelector(elm)] = getStyles(elm);
+        }
+        let style = getStyle(element);
+        styles[getSelector(element)] = style;
+        return styles;
+    }
+
+    static getStyleArray(styles, parent = "") {
+        let final = parent.trim();
+        let children = [];
+        for (let selector in styles) {
+            if (typeof styles[selector] != "string") {
+                children.push(getStyleArray(styles[selector], parent + " " + selector));
+            } else {
+                //final += " " + selector;
+            }
+        }
+        return [final, children];
+    }
+
+    static applyStyles(data) {
+        let selector = data[0];
+        let children = data[1];
+        if (children.length > 0) {
+            for (let child of children) {
+                applyStyles(child);
+            }
+        } else {
+            console.log(selector);
+            //document.querySelector(selector).style.color = "red";
+        }
+    }
+}
+
+class DisplayController {
+    constructor() {
+        this.UIData = {
+            "ticket": [
+                ["admin.TA.newTicket()", "New Ticket"],
+                ["admin.TA.closeTicket()", "Close Ticket"],
+                ["admin.TA.hideTicket()", "Hide Ticket"],
+                ["admin.TA.requestPopout()", "Popout Ticket"],
+                ["admin.TA.showOpenDisplayData()", "Open"],
+                ["admin.TA.showClosedDisplayData()", "Closed"]
+            ],
+            "user": [
+                ["", "New User"],
+                ["", "Clone User"],
+                ["", "Hide User"],
+                ["", "Popout User"],
+                ["", "Staff"],
+                ["", "Customers"]
+            ]
+        }
+
+        this.template = `
+        <div class="nav">
+            <ul>
+                <li onclick="$0">$1</li>
+                <li onclick="$0">$1</li>
+                <li onclick="$0">$1</li>
+                <li onclick="$0">$1</li>
+            </ul>
+            <input id="$type_search_box" class="search_box" placeholder="Search" />
+        </div>
+        <div id="$type_tabs" class="tab_container">
+            <div onclick="$0" class="tab open selected">$1</div>
+            <div onclick="$0" class="tab closed">$1</div>
+        </div>
+        <div id="$type_list" class="list"></div>
+        <div id="$type" class="$type data_container"></div>
+        <div id="loader" class="loader"></div>
+        `;
+    }
+
+    getTemplate(type) {
+        let data = this.UIData[type];
+        let lines = this.template.split("\n")
+        let index = 0;
+        let newLines = "";
+        for (let line of lines) {
+            line = line.replace(/\$type/g, type);
+            if (line.indexOf("$0") !== -1) {
+                for (let i in data[index]) {
+                    let item = data[index][i];
+                    line = line.replace("$" + i, item);
+                }
+                index++;
+            }
+            newLines += line + "\n";
+        }
+        return newLines;
+    }
+
+    generateUI() {
+        let panel_container = document.createElement("div");
+        panel_container.id = "panel_container";
+        let ticket_panel = document.createElement("div");
+        ticket_panel.id = "ticket_panel";
+        ticket_panel.className = "panel";
+        let user_panel = document.createElement("div");
+        user_panel.id = "user_panel";
+        user_panel.className = "panel";
+        let template = this.getTemplate("ticket");
+        ticket_panel.innerHTML = template;
+        template = this.getTemplate("user");
+        user_panel.innerHTML = template;
+        panel_container.appendChild(ticket_panel);
+        //panel_container.appendChild(user_panel);
+        document.body.appendChild(panel_container);
+    }
+}
+
+class UserAdmin {
+    constructor() {
+
+    }
+
+}
+
+class Admin {
+    constructor(server_url, connect = true) {
+        this.display = new DisplayController();
+        this.display.generateUI();
         this.server_url = server_url;
+        this.socket = false;
+        if (connect) this.connect();
+        this.TA = new TicketAdmin(this.socket);
+        this.UA = new UserAdmin(this.socket);
+    }
+
+    connect() {
+        let socket = io(this.server_url);
+        this.socket = socket;
+    }
+
+    on(event, func) {
+        if (this.connect) {
+            this.socket.on(event, func);
+        }
+    }
+}
+
+class TicketAdmin {
+    constructor(socket) {
         this.ticket_container = document.getElementById("ticket");
         this.ticket_list_container = document.getElementById("ticket_list");
         this.ticket_tabs = document.getElementById("ticket_tabs");
         this.ticket_panel = document.getElementById("ticket_panel");
-        this.search_box = document.getElementById("search_box");
+        this.search_box = document.getElementById("ticket_search_box");
         this.audio = document.createElement("audio");
         this.audio.src = "ding.wav";
         this.ticket_type = "questionnaire";
@@ -27,7 +261,7 @@ class TicketAdmin {
             "password": "password"
         }
         this.internal_list = {};
-        if (connect) this.connect();
+        this.connect(socket);
         this.history = {
             tickets: [],
             index: -1
@@ -77,33 +311,29 @@ class TicketAdmin {
         }
     }
 
-    updateTimes() {
-        /* document.querySelectorAll(".timeago").forEach(function (e) {
-            let time = e.getAttribute("value");
-            e.innerHTML = timeAgo(time);
-        }); */
-    }
-
     showLogin() {
         this.ticket_container.innerHTML = "";
         this.ticket_list_container.innerHTML = "";
-        this.ticket_tabs.className = "";
+        this.ticket_tabs.removeClass("logged_in");
         let loginForm = document.createElement("form");
         loginForm.id = "ticket_form";
+        loginForm.addClass("form_container")
         loginForm.setAttribute('onsubmit', 'return false;');
         let html = `
             <label>Username:</label><input type="text" name="username" />
             <label>Password:</label><input type="password" name="password" />
-            <button onclick='TA.login()'>Login</button>
+            <button onclick='admin.TA.login()'>Login</button>
         `;
         loginForm.innerHTML = html;
         this.ticket_container.appendChild(loginForm);
+        this.clearSelectedOption();
     }
 
     login() {
         let username = this.ticket_container.querySelector("[name=username]").value;
         let password = this.ticket_container.querySelector("[name=password]").value;
-        this.ticket_panel.className = "waiting";
+        this.ticket_panel.addClass("waiting");
+        //this.ticket_panel.className = "waiting";
         this.socket.emit('login', {
             username: username,
             password: password
@@ -127,11 +357,8 @@ class TicketAdmin {
     }
 
     hideTicket(ticket_id = this.ticket_id) {
-        let opt = document.getElementById(ticket_id);
-        if (opt) {
-            opt.className = opt.className.replace("selected").replace("  ", "");
-            this.ticket_container.innerHTML = `<h2 style="margin-left:20px;">Please select a ticket</h2>`;
-        }
+        this.clearSelectedOption();
+        this.ticket_container.innerHTML = `<h2 style="margin-left:20px;">Please select a ticket</h2>`;
     }
 
     updateTicket() {
@@ -155,10 +382,11 @@ class TicketAdmin {
 
     newTicket() {
         if (!this.logged_in) return false;
+        this.clearSelectedOption();
         this.populateDisplay("admin");
         this.ticket_type = "admin";
         this.ticket_id = "";
-        let button = document.querySelector("#action_container button");
+        let button = this.ticket_panel.querySelector(".action_container button");
         let parent = this;
         button.onclick = () => {
             parent.submitNew()
@@ -173,6 +401,16 @@ class TicketAdmin {
             data: this.getFormData()
         }
         this.socket.emit('submit_user', packet);
+    }
+
+    requestTemplate() {
+        if (!this.logged_in) return false;
+        this.socket.emit('admin_templates');
+    }
+
+    requestListAll() {
+        if (!this.logged_in) return false;
+        this.socket.emit('admin_list_all');
     }
 
     requestDisplayData() {
@@ -207,129 +445,92 @@ class TicketAdmin {
         document.querySelector("#ticket_tabs ." + name).className += " selected";
     }
 
-    requestTemplate() {
-        if (!this.logged_in) return false;
-        this.socket.emit('admin_templates');
-    }
+    connect(socket) {
+        if (socket) {
+            let parent = this;
 
-    requestListAll() {
-        if (!this.logged_in) return false;
-        this.socket.emit('admin_list_all');
-    }
+            socket.on('connect', function (data) {
+                parent.showLogin();
+            });
 
-    connect() {
-        let socket = io(this.server_url);
-        this.socket = socket;
-        let parent = this;
+            socket.on('disconnect', function (data) {
+                parent.showLogin();
+            });
 
-        this.socket.on('connect', function (data) {
-            parent.showLogin();
-        });
+            socket.on('list_all', function (data) {
+                parent.handleList(data);
+            });
 
-        this.socket.on('disconnect', function (data) {
-            parent.showLogin();
-        });
+            socket.on('admin_templates', function (data) {
+                parent.handleTemplate(data);
+            });
 
-        this.socket.on('list_all', function (data) {
-            parent.handleList(data);
-        });
+            socket.on('admin_ticket_data', function (data) {
+                parent.handleTicket(data);
+            });
 
-        this.socket.on('admin_templates', function (data) {
-            parent.handleTemplate(data);
-        });
+            socket.on('admin_display_data', function (data) {
+                parent.handleDisplayData(data);
+            });
 
-        this.socket.on('admin_ticket_data', function (data) {
-            parent.handleTicket(data);
-        });
+            socket.on('search_results', function (data) {
+                parent.handleSearchResults(data);
+            });
 
-        this.socket.on('admin_display_data', function (data) {
-            parent.handleDisplayData(data);
-        });
-
-        this.socket.on('search_results', function (data) {
-            parent.handleSearchResults(data);
-        });
-
-        this.socket.on('note_update_status', function (data) {
-            if (data.status == "success") {
-                parent.ticket_container.querySelector("[name=notes].outdated").className = "";
-            }
-        });
-
-        this.socket.on('call_update', function (data) {
-            if (data.id != parent.editing_call_notes) {
-                if (data.ticket_id == parent.ticket_id) {
-                    let elm = document.getElementById(data.id);
-                    let newElm = parent.generateCallContainer(data);
-                    if (elm) {
-                        parent.call_control_container.insertBefore(newElm, elm);
-                        if (elm.querySelector(".drop_down").className.indexOf("showing") != -1) {
-                            newElm.querySelector(".drop_down").className += " showing";
-                        }
-                        if (elm.className.indexOf("showing") != -1) {
-                            newElm.className += " showing";
-                        }
-                        elm.querySelectorAll(".duration .time").forEach(e => {
-                            if (e.hasAttribute("interval")) {
-                                let interval = e.getAttribute("interval");
-                                clearInterval(interval);
-                            }
-                        });
-                        elm.remove();
-
-                    } else {
-                        parent.call_control_container.appendChild(newElm);
-                    }
-                    if (parent.awaiting_call) {
-                        let label = newElm.querySelector("label");
-                        label.click();
-                        parent.awaiting_call = false;
-                    }
+            socket.on('note_update_status', function (data) {
+                if (data.status == "success") {
+                    parent.ticket_container.querySelector("[name=notes].outdated").className = "";
                 }
-            } else {
-                //parent.editing_call_notes = "";
-            }
-        });
+            });
 
-        this.socket.on('ticket_update', function (data) {
-            let opt = document.getElementById(data.id);
-            let selected = false;
-            if (opt) {
-                if (opt.className.indexOf("selected") !== -1) selected = true;
-                opt.className = "option" + (selected ? " selected" : "");
-                opt.className += " " + data.data.status;
-                parent.placeOption(opt, data.data.status == "closed");
-            } else {
-                let opt = parent.generateOption(data.id, data.data);
-                parent.setTime(opt.querySelector(".timeago"));
-                parent.placeOption(opt, data.data.status == "closed");
-                parent.internal_list[data.data.status == "closed" ? "closed" : "open"].push(data.id);
-                parent.audio.play();
-            }
-            if (parent.ticket_id == data.id) {
-                parent.fillForm({
-                    type: parent.ticket_type,
-                    data: data.data
-                });
-            }
-        });
+            socket.on('call_update', function (data) {
+                parent.handleCallUpdate(data);
+            });
 
-        this.socket.on('login', function (data) {
-            if (data.status === "success") {
-                document.querySelector("#nav ul").className = "logged_in";
-                document.querySelector("#ticket_tabs").className = "logged_in";
-                parent.ticket_container.innerHTML = `<h2 style="margin-left:20px;">Please select a ticket</h2>`;
-                parent.logged_in = true;
-                parent.requestListAll();
-                parent.requestTemplate();
-            } else {
-                alert(data.message);
-            }
-            parent.ticket_panel.className = "";
-        });
+            socket.on('ticket_update', function (data) {
+                let opt = document.getElementById(data.id);
+                let selected = false;
+                if (opt) {
+                    if (opt.className.indexOf("selected") !== -1) selected = true;
+                    opt.className = "option" + (selected ? " selected" : "");
+                    opt.className += " " + data.data.status;
+                    parent.placeOption(opt, data.data.status == "closed");
+                } else {
+                    let opt = parent.generateOption(data.id, data.data);
+                    parent.setTime(opt.querySelector(".timeago"));
+                    parent.placeOption(opt, data.data.status == "closed");
+                    parent.internal_list[data.data.status == "closed" ? "closed" : "open"].push(data.id);
+                    parent.audio.play();
+                }
+                if (parent.ticket_id == data.id) {
+                    parent.fillForm({
+                        type: parent.ticket_type,
+                        data: data.data
+                    });
+                }
+            });
 
-        this.socket.on('result_user', (data) => this.handleResult(data));
-        this.socket.on('admin_nonce', (data) => this.handlePopout(data));
+            socket.on('login', function (data) {
+                if (data.status === "success") {
+                    document.querySelectorAll(".nav ul").forEach(e => e.addClass("logged_in")); //toggleClass(e, "logged_in"));
+                    document.querySelectorAll(".tab_container").forEach(e => e.addClass("logged_in")); //toggleClass(e, "logged_in"));
+                    parent.ticket_container.innerHTML = `<h2 style="margin-left:20px;">Please select a ticket</h2>`;
+                    parent.logged_in = true;
+                    parent.requestListAll();
+                    parent.requestTemplate();
+                    parent.server_url = data.server_url;
+                } else {
+                    alert(data.message);
+                }
+                parent.ticket_panel.removeClass("waiting");
+                //toggleClass(parent.ticket_panel, "waiting");
+                //parent.ticket_panel.className = "";
+            });
+
+            socket.on('result_user', (data) => this.handleResult(data));
+            socket.on('admin_nonce', (data) => this.handlePopout(data));
+            this.socket = socket;
+        }
     }
 
     placeOption(opt, closed = false) {
@@ -369,6 +570,41 @@ class TicketAdmin {
         }
     }
 
+    handleCallUpdate(data) {
+        if (data.id != this.editing_call_notes) {
+            if (data.ticket_id == this.ticket_id) {
+                let elm = document.getElementById(data.id);
+                let newElm = this.generateCallContainer(data);
+                if (elm) {
+                    this.call_control_container.insertBefore(newElm, elm);
+                    if (elm.querySelector(".drop_down").className.indexOf("showing") != -1) {
+                        newElm.querySelector(".drop_down").className += " showing";
+                    }
+                    if (elm.className.indexOf("showing") != -1) {
+                        newElm.className += " showing";
+                    }
+                    elm.querySelectorAll(".duration .time").forEach(e => {
+                        if (e.hasAttribute("interval")) {
+                            let interval = e.getAttribute("interval");
+                            clearInterval(interval);
+                        }
+                    });
+                    elm.remove();
+
+                } else {
+                    this.call_control_container.appendChild(newElm);
+                }
+                if (this.awaiting_call) {
+                    let label = newElm.querySelector("label");
+                    label.click();
+                    this.awaiting_call = false;
+                }
+            }
+        } else {
+            //this.editing_call_notes = "";
+        }
+    }
+
     handleSearchResults(data) {
         this.ticket_container.innerHTML = "";
         if (data.results == undefined || data.results.length == 0) {
@@ -405,14 +641,12 @@ class TicketAdmin {
         let ticket = data.ticket;
         let id = this.socket.id;
         let nonce = data.nonce;
-        let url = `https://richard.works:3009/admin/viewticket?ticket=${ticket}&id=${id}&nonce=${nonce}`;
+        let url = `${this.server_url}/admin/viewticket?ticket=${ticket}&id=${id}&nonce=${nonce}`;
         window.open(url, "", "width=800,height=800");
     }
 
     requestPopout(ticket_id) {
         if (this.logged_in) {
-            //https://richard.works:3009/admin/viewticket?ticket=C13529&id=fjaslkdfjlsdkaf&nonce=jfasldkfjalskjflaksjdf
-
             this.socket.emit('admin_nonce', {
                 ticket: ticket_id || this.ticket_id
             });
@@ -433,11 +667,28 @@ class TicketAdmin {
             this.form.className = "success";
             this.output.className = "success";
             this.submit_button.style.display = "none";
-            this.output.innerHTML = `<label>Ticket Number: ${data.data}</label><label>SUCCESS</label>`;
+            let i = 5;
+            this.output.innerHTML = `<label>Ticket Number: ${data.data}</label><label>SUCCESS<label id="redirect_countdown">Selecting in ${i} seconds (click to cancel)</label></label>`;
             let parent = this;
-            setTimeout(function () {
-                parent.requestListAll();
-                parent.getTicket(data.data);
+            let interval;
+            let redirect_label = document.getElementById("redirect_countdown");
+            this.output.onclick = function () {
+                redirect_label.innerHTML = "Selection Canceled";
+                clearInterval(interval);
+                setTimeout(function () {
+                    parent.hideTicket();
+                    parent.output.onclick = undefined;
+                }, 500);
+            }
+            interval = setInterval(function () {
+                i--;
+                redirect_label.innerHTML = `Selecting in ${i} seconds (click to cancel)`;
+                if (i <= 0) {
+                    clearInterval(interval);
+                    parent.requestListAll();
+                    parent.getTicket(data.data);
+                    parent.output.onclick = undefined;
+                }
             }, 1000);
         }
     }
@@ -461,6 +712,7 @@ class TicketAdmin {
             let opt = this.generateOption(ticket, data.data[ticket]);
             this.ticket_list.appendChild(opt);
         }
+        if (this.ticket_id != "") this.ticket_list.querySelector("#" + this.ticket_id).className += " selected";
         this.ticket_list_container.innerHTML = "";
         wrapper.appendChild(this.ticket_list);
         this.ticket_list_container.appendChild(wrapper);
@@ -497,18 +749,18 @@ class TicketAdmin {
 
     handleTicket(data) {
         if (!this.logged_in) return false;
+        clearTimeout(this.waiting_timeout);
+        this.waiting_timeout = setTimeout(function () {
+            this.ticket_panel.removeClass("waiting");
+        }, 500);
+
         this.ticket_type = data.type;
         this.ticket_data = data;
         this.populateDisplay(data.type);
         this.fillForm(data);
-        setTimeout(function () {
-            this.ticket_panel.className = "";
-        }, 500);
-        console.log(data);
+
         this.call_control_container = this.generateCallControls(data.call_data, data.data.status != "closed");
         this.form.prepend(this.call_control_container);
-
-
         this.setSelectedOption(data.data.id);
     }
 
@@ -550,7 +802,7 @@ class TicketAdmin {
     generateCallControls(calls, open = true) {
         let call_control_container = document.createElement("div");
         call_control_container.className = "call_control drop_down";
-        call_control_container.innerHTML = `<label onclick="toggleClass(this.parentElement,'showing')">Customer Interactions</label>`;
+        call_control_container.innerHTML = `<label onclick="this.parentElement.toggleClass('showing')">Customer Interactions</label>`;
         if (open) {
             let new_call_button = document.createElement("button");
             new_call_button.innerHTML = "New Call";
@@ -615,7 +867,7 @@ class TicketAdmin {
                             </div>      
                       
                             <div class='duration'>
-                                <label class='info'>Duration:</label> <div class='time'>${call.ongoing ? formatDuration(call.start, (new Date()).getTime()) : formatDuration(call.start, call.end)}</div>
+                                <label class='info'>Duration:</label> <div class='time'>${call.ongoing ? Helper.formatDuration(call.start, (new Date()).getTime()) : Helper.formatDuration(call.start, call.end)}</div>
                             </div>
                             <div><label class='info'>Number:</label><div><input disabled type='text' value='${call.number}'/></div></div>
                             <div class="drop_down">
@@ -635,7 +887,7 @@ class TicketAdmin {
             let timeDiv = callDiv.querySelector(".duration .time");
             if (timeDiv) {
                 let interval = setInterval(function (elm) {
-                    elm.innerHTML = formatDuration(call.start, (new Date()).getTime())
+                    elm.innerHTML = Helper.formatDuration(call.start, (new Date()).getTime())
                 }, 1000, timeDiv)
                 timeDiv.setAttribute("interval", interval);
             }
@@ -652,16 +904,18 @@ class TicketAdmin {
     }
 
     toggleDropDown(elm, collapse) {
-        if (elm.className.indexOf("showing") == -1) {
-            this.openDropDown(elm, collapse);
+        if (elm.hasClass("showing")) {
+            elm.removeClass("showing");
+
         } else {
-            this.openDropDown(elm, false);
+            this.openDropDown(elm, collapse);
+
         }
     }
 
     openDropDown(elm, collapse = true) {
         if (collapse) this.collapseDropDowns(this.call_control_container);
-        toggleClass(elm, "showing");
+        elm.addClass("showing");
     }
 
     collapseDropDowns(in_elm) {
@@ -669,12 +923,17 @@ class TicketAdmin {
             in_elm = this.ticket_panel;
         }
         in_elm.querySelectorAll(".drop_down.showing").forEach(e => {
-            toggleClass(e, "showing");
+            e.removeClass("showing");
         });
     }
 
+    clearSelectedOption() {
+        if (this.ticket_list)
+            this.ticket_list.querySelectorAll(".option.selected").forEach((e) => e.className = e.className.replace("selected", "").trim().replace("  ", " "));
+    }
+
     setSelectedOption(id) {
-        this.ticket_list.querySelectorAll(".option.selected").forEach((e) => e.className = e.className.replace("selected", "").trim().replace("  ", " "));
+        this.clearSelectedOption();
         if (id != "") {
             let opt = document.getElementById(id);
             if (opt) opt.className += " selected";
@@ -708,7 +967,8 @@ class TicketAdmin {
     getTicket(id) {
         if (!this.logged_in) return false;
         this.search_box.value = "";
-        this.ticket_panel.className = "waiting";
+        //this.ticket_panel.className = "waiting";
+        this.ticket_panel.addClass("waiting");
         this.socket.emit('admin_get_ticket', {
             id: id
         });
@@ -728,6 +988,7 @@ class TicketAdmin {
         if (!this.logged_in) return false;
         this.action_container = document.createElement("div");
         this.action_container.id = "action_container";
+        this.action_container.addClass("action_container");
         this.output = document.createElement("div");
         this.output.id = "output";
         this.submit_button = document.createElement("button");
@@ -745,6 +1006,7 @@ class TicketAdmin {
         this.form.appendChild(this.name_box);
         this.form.setAttribute("onsubmit", "return false;");
         this.form.id = "ticket_form";
+        this.form.addClass("form_container");
         for (let item in template) {
             if (template[item].hidden) continue;
             let itemDiv = document.createElement("div");

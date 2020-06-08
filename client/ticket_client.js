@@ -1,5 +1,5 @@
 class TicketClient {
-    constructor(server_url = 'https://richard.works:3009', connect = true) {
+    constructor(server_url) {
         this.server_url = server_url;
         this.form_container = document.getElementById("form_container");
         this.type = this.form_container.getAttribute("type");
@@ -74,10 +74,10 @@ class TicketClient {
             this.output.className = "failure";
         } else {
             this.submitted = true;
-            this.form.className = "success";
+            this.form.className = "success form_container";
             this.output.className = "success";
             this.action_container.style.display = "none";
-            this.output.innerHTML = `<label>Ticket Number: <a href="https://richard.works/projects/TMS/common/ticket_viewer.html?ticket=${data.data}">${data.data}</a></label><label>SUCCESS</label>`;
+            this.output.innerHTML = `<label>Ticket Number: <a href="${data.url}">${data.data}</a></label><label>SUCCESS</label>`;
         }
     }
 
@@ -105,7 +105,7 @@ class TicketClient {
                 nonce: this.nonce
             });
         } else {
-            let url = "https://richard.works/projects/TMS/common/ticket_viewer.html?ticket=" + packet["ticket_id"];
+            let url = window.location.href.replace("/client", "") + "common/ticket_viewer.html?ticket=" + packet["ticket_id"];
             window.location.href = url;
         }
     }
@@ -121,12 +121,14 @@ class TicketClient {
         let form = this.generateForm(view_template, false);
         this.type = "ticket_id";
         this.form_container.innerHTML = "";
+        this.form_container.className = "panel";
         this.form_container.appendChild(form);
     }
 
     generateForm(template, show_view_ticket = true) {
         this.action_container = document.createElement("div");
         this.action_container.id = "action_container";
+        this.action_container.className = "action_container";
         this.output = document.createElement("div");
         this.output.id = "output";
         if (show_view_ticket) this.view_button = document.createElement("button");
@@ -147,10 +149,11 @@ class TicketClient {
         if (show_view_ticket) this.action_container.appendChild(this.view_button);
         let formDiv = document.createElement("div");
         formDiv.id = "ticket_panel";
-        formDiv.className = "client";
+        formDiv.className = "client panel";
         this.form = document.createElement("form");
         this.form.setAttribute("onsubmit", "return false;");
         this.form.id = "ticket_form";
+        this.form.className = "form_container";
         for (let item in template) {
             let itemDiv = document.createElement("div");
             let itemLabel = document.createElement("label");

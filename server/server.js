@@ -15,7 +15,7 @@ let options = {
 
 var app = https.createServer(options, handler);
 var io = require('socket.io')(app);
-app.listen(3009);
+app.listen(Configuration.get("port"));
 
 /* let Mailer = new Mail();
 
@@ -27,16 +27,18 @@ process.stdin.on("data", function (data) {
     let input = data.toString().trim();
     let parts = input.split(" ");
     let cmd = parts.length > 0 ? parts[0] : input;
+    parts.splice(0, 1);
     switch (cmd) {
         case "new":
-            if (parts.length > 1) {
-                bcrypt.hash(parts[1], 10, function (err, hash) {
-                    if (err) {
-                        return err;
-                    } else {
-                        console.log(hash);
-                    }
-                });
+            console.log(parts);
+            if (parts.length > 2) {
+                let type = parts[0];
+                if(type != "customer" && type != "admin"){
+                    console.log("Accepted types are 'customer' and 'admin'");
+                } else {
+                    let user = User.create(parts[1], parts[2], {is_admin:type=="admin"});
+                    console.log(user);
+                }
             } else {
                 console.log("Invalid command options");
             }
@@ -53,6 +55,22 @@ process.stdin.on("data", function (data) {
                     }
                 });
             }
+            break;
+        case "user":
+            let user = new User(parts[0], parts[1]);
+            if (!user.logged_in) {
+                if (!user.exists) {
+                    console.log("User does not exist!");
+                } else {
+                    console.log("User login failed!");
+                }
+            } else {
+                console.log(user.data);
+            }
+            break;
+        default:
+            console.log(cmd + " - Command Not Found");
+            break;
     }
 });
 
@@ -125,7 +143,8 @@ io.on('connection', function (socket) {
         }
         socket.emit('login', {
             status: status,
-            message: message
+            message: message,
+            server_url: Configuration.get("host") + ":" + Configuration.get("port")
         });
     });
 
@@ -152,7 +171,8 @@ io.on('connection', function (socket) {
             let result = tm.newTicket(data.data, data.type);
             socket.emit('result_user', {
                 result: typeof result == "string" ? "success" : "failure",
-                data: result
+                data: result,
+                url: `${Configuration.get("host")}${Configuration.get("path")}/common/ticket_viewer.html?ticket=${result}`
             });
             if (typeof result == "string") {
                 informAdminTicket(result);
@@ -264,6 +284,7 @@ io.on('connection', function (socket) {
 
     socket.on('admin_get_ticket', function (data) {
         if (admin) {
+            console.log(`Admin ${user.username} requested ticket ${data.id}`);
             let id = data.id;
             let ticket = tm.getTicket(id);
             if (ticket.data.status == "unread") {
