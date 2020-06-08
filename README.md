@@ -5,12 +5,12 @@ Allow users to create tickets (contact forms) using simple templates
 
 ### Install
 ```
-git clone https://github.com/richardred15/TMS.git
+git clone https://github.com/richardred15/TMS.git .
 cd TMS
 chmod +x setup.sh
 ./setup.sh
 ```
-
+### server/template.json
 ```javascript
     "form_type":{
         "form_field": {
@@ -25,7 +25,7 @@ chmod +x setup.sh
         }
     }
 ```
-
+#### Example
 ```javascript
     "method": {
         "type": "selection",
