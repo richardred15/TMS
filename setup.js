@@ -294,7 +294,13 @@ function finish(installed) {
         process.stdout.write("   config.json written...\n\n");
         process.stdout.write(`   Copy \x1b[33m./config.json\x1b[0m to \x1b[33m./server/config.json\x1b[0m if it is correct\n\n`);
 
-        process.stdout.write(`   To start the server on port \x1b[36m${config.port}\x1b[0m run \x1b[35mnode server/server.js\x1b[0m\n\n`);
+        process.stdout.write("   config.js written...\n\n");
+        process.stdout.write(`   Copy \x1b[33m./config.js\x1b[0m to \x1b[33m./common/config.js\x1b[0m if it is correct\n\n`);
+
+        process.stdout.write(`   To start the server on port \x1b[36m${config.port}\x1b[0m run:\n\n`);
+        process.stdout.write(`           \x1b[35mcd server\x1b[0m\n\n`);
+        process.stdout.write(`           \x1b[35msudo npm install\x1b[0m\n\n`);
+        process.stdout.write(`           \x1b[35mnode server.js\x1b[0m\n\n`);
 
         process.stdout.write(`   Your admin panel is accessible at \x1b[32m${url}${config.path}/admin\x1b[0m\n\n`);
 
