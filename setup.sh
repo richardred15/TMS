@@ -17,7 +17,7 @@ if $has_node ; then
     if [ $node_ver -lt "1200" ]; then
         echo Node $node_ver_raw Too Old!
     else
-        node config.js
+        node setup.js
     fi
 else
     echo -e "   \033[31mNode Installation Not Found... Exiting!\e[0m"
