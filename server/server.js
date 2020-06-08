@@ -33,10 +33,12 @@ process.stdin.on("data", function (data) {
             console.log(parts);
             if (parts.length > 2) {
                 let type = parts[0];
-                if(type != "customer" && type != "admin"){
+                if (type != "customer" && type != "admin") {
                     console.log("Accepted types are 'customer' and 'admin'");
                 } else {
-                    let user = User.create(parts[1], parts[2], {is_admin:type=="admin"});
+                    let user = User.create(parts[1], parts[2], {
+                        is_admin: type == "admin"
+                    });
                     console.log(user);
                 }
             } else {
@@ -334,7 +336,7 @@ io.on('connection', function (socket) {
 
 function handler(req, res) {
     res.writeHead(200, {
-        "Access-Control-Allow-Origin": "https://richard.works",
+        "Access-Control-Allow-Origin": Configuration.get("host"),
         "Content-Type": "text/html"
     });
     let url = new URL(req.url, `http://${req.headers.host}`);
@@ -351,7 +353,9 @@ function handler(req, res) {
                     let ticket_data = JSON.stringify(ticket_object);
                     let ticket_template = JSON.stringify(tm.getTemplate(ticket_object.type))
                     let html = fs.readFileSync("./pages/admin_view.html").toString();
-                    res.write(html.replace("'${ticket_data}'", ticket_data).replace("'${ticket_template}'", ticket_template));
+                    html = html.replace("'${ticket_data}'", ticket_data).replace("'${ticket_template}'", ticket_template);
+                    html = html.replace(/\$\{url\}/g, Configuration.get("host") + Configuration.get("path"));
+                    res.write(html);
                 }
             }
         } else {

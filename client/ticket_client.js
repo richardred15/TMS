@@ -121,7 +121,6 @@ class TicketClient {
         let form = this.generateForm(view_template, false);
         this.type = "ticket_id";
         this.form_container.innerHTML = "";
-        this.form_container.className = "panel";
         this.form_container.appendChild(form);
     }
 

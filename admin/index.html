@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"
         integrity="sha256-Dul4c09cdrWKXVtallPxF558lwxMwCC8dXJdZ0PVW54=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../common/style.css" />
+    <script src="../common/config.js"></script>
     <script src="timeago.js"></script>
     <script src="ticket_admin.js"></script>
 </head>
@@ -15,7 +16,7 @@
 <body>
 
     <script>
-        let admin = new Admin("https://richard.works:3009");
+        let admin = new Admin(`${config.host}:${config.port}`);
     </script>
 </body>
 

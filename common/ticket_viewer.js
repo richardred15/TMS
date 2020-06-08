@@ -34,7 +34,7 @@ function startViewer() {
 }
 
 function submitForm() {
-    let url = "https://richard.works/projects/TMS/common/ticket_viewer.html?ticket=" + container.querySelector("[name=ticket_id]").value;
+    let url = config.host + "/projects/TMS/common/ticket_viewer.html?ticket=" + container.querySelector("[name=ticket_id]").value;
     window.location.href = url;
 }
 

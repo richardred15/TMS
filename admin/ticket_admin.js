@@ -664,8 +664,8 @@ class TicketAdmin {
             this.output.className = "failure";
         } else {
             this.submitted = true;
-            this.form.className = "success";
-            this.output.className = "success";
+            this.form.addClass("success");
+            this.output.addClass("success");
             this.submit_button.style.display = "none";
             let i = 5;
             this.output.innerHTML = `<label>Ticket Number: ${data.data}</label><label>SUCCESS<label id="redirect_countdown">Selecting in ${i} seconds (click to cancel)</label></label>`;

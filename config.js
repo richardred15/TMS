@@ -119,10 +119,12 @@ let rules = {
             test = test.toLowerCase();
             if (test.indexOf("y") == 0) {
                 url = "https://" + config.host;
+                config.host = url;
                 return true;
             } else {
                 url += config.host;
                 console.log("HTTPS Disabled!");
+                config.host = url;
                 return false
             }
         },

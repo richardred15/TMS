@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://richard.works/projects/TMS/common/style.css" />
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
     <div id="form_container" class="client panel"></div>
-    <script src="https://richard.works/projects/TMS/common/ticket_viewer.js"></script>
+    <script src="ticket_viewer.js"></script>
 
     <script>
         let args = {};
@@ -24,17 +25,18 @@
         let TC;
         let form;
 
-        fetch("https://richard.works:3009/viewticket?ticket=" + ticket_id).then(response => response.text()).then(
-            data => {
-                data = JSON.parse(data);
-                ticket_template = data.template;
-                ticket_template.status = {
-                    type: "text",
-                    label: "Ticket Status:"
-                }
-                ticket_data = data.data;
-                setup();
-            });
+        fetch(`${config.host}:${config.port}` + "/viewticket?ticket=" + ticket_id).then(response => response.text())
+            .then(
+                data => {
+                    data = JSON.parse(data);
+                    ticket_template = data.template;
+                    ticket_template.status = {
+                        type: "text",
+                        label: "Ticket Status:"
+                    }
+                    ticket_data = data.data;
+                    setup();
+                });
 
         function setup() {
             let form = generateForm(ticket_template);
