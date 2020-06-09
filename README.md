@@ -3,6 +3,13 @@
 ## Ticket Management System
 Allow users to create tickets (contact forms) using simple templates
 
+## Demo Admin https://richard.works/projects/TMS/admin/
+```
+username: admin
+password: password
+```
+## Demo Client https://richard.works/projects/TMS/client/
+
 ### Install
 ```
 git clone https://github.com/richardred15/TMS.git .
