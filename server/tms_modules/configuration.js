@@ -7,6 +7,11 @@ class Configuration {
         this.load();
     }
 
+    set(key, value) {
+        this.data[key] = value;
+        this.save();
+    }
+
     get(key) {
         return this.data[key];
     }
@@ -29,5 +34,6 @@ class Configuration {
 }
 
 let Conf = new Configuration();
+
 
 module.exports = Conf;

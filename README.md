@@ -15,11 +15,13 @@ password: password
 
 ### Install
 ```
-git clone https://github.com/richardred15/TMS.git .
+mkdir TMS
 cd TMS
+git clone https://github.com/richardred15/TMS.git .
 chmod +x setup.sh
 ./setup.sh
 ```
+
 #### Post Setup
 ```
 cd server
