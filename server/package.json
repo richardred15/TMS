@@ -23,7 +23,7 @@
     "md5": "^2.2.1",
     "node-pre-gyp": "^0.15.0",
     "nodemailer": "^6.4.8",
-    "simple-ffdb": "^0.1.23",
+    "simple-ffdb": "^0.1.24",
     "socket.io": "^2.3.0"
   }
 }

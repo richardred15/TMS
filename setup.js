@@ -75,7 +75,7 @@ let complete = false;
 let prompts = {
     "host": "Please enter server hostname e.g. richard.works",
     "port": `Please enter Node Server Port (${config.port})`,
-    "path": "Please enter path to TMS files e.g. /var/www/TMS",
+    "path": "Please enter url path to TMS files e.g. /pages/TMS",
     "https": {
         "enable": "Type 'y' to enabled HTTPS",
         "key": "Please enter key file path",
