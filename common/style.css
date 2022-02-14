@@ -35,7 +35,7 @@
 }
 
 .form_container label {
-    color: #fff;
+    color: #111;
     display: block;
     margin: 7px 0px 0px 0px;
     text-transform: capitalize;
@@ -100,8 +100,7 @@
 .form_container textarea,
 .form_container select,
 .form_container option {
-    background-color: rgba(208, 216, 255, 0.4);
-    color: white;
+    color: rgb(15, 15, 15);
     max-width: 600px;
 }
 
@@ -185,6 +184,8 @@
 
 .data_container .call_info .drop_down label {
     margin-top: 7px;
+    background-color: rgba(208, 216, 255, 0.4);
+    padding: 5px;
 }
 
 /* .data_container .call_info .duration {
@@ -207,7 +208,7 @@
 }
 
 .data_container .call_control button {
-    background-color: white;
+    background-color: #EFEFEF;
     border: none;
     border-radius: 0px;
     color: black;
@@ -283,14 +284,18 @@
 }
 
 .data_container .drop_down:before {
-    color: white;
+    color: #111;
     content: ">";
     font-weight: bold;
     position: absolute;
-    right: 10px;
-    top: 8px;
+    right: 20px;
+    top: 5px;
     transform: rotate(0deg);
     transition: all 0.3s ease;
+}
+
+.call_info .drop_down:before {
+    top: 12px;
 }
 
 .form_container #cancel_button {
@@ -313,14 +318,14 @@
 }
 
 .form_container .other {
-    border-width: 0px;
-    height: 0px;
+    border-width: 0px !important;
+    height: 0px !important;
     margin-top: 0px;
 }
 
 .form_container .other.showing {
-    border-width: 1px;
-    height: auto;
+    border-width: 1px !important;
+    height: auto !important;
     margin-top: 5px;
 }
 
@@ -364,12 +369,13 @@ button {
 }
 
 .panel {
-    background: linear-gradient(200deg, #3586d8 0%, #00197d 100%);
+
     border: 1px solid lightgray;
     border-bottom: 7px solid rgb(36, 36, 36);
     border-radius: 5px 5px 10px 10px;
     display: grid;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3586d8', endColorstr='#00197d', GradientType=1);
+    /* background: linear-gradient(200deg, #3586d8 0%, #00197d 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3586d8', endColorstr='#00197d', GradientType=1); */
     font-family: sans-serif;
     grid-template-columns: 200px 1fr;
     grid-template-rows: 50px 35px 1fr;
@@ -450,7 +456,7 @@ button {
 }
 
 .data_container {
-    color: #ddd;
+    color: #111;
     grid-row-end: 4;
     grid-row-start: 2;
     padding-bottom: 20px;
